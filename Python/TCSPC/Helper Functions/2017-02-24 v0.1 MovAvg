@@ -1,0 +1,21 @@
+import math
+import numpy as np
+class SmoothingError(Exception):
+    pass
+class VectorError(Exception):
+    pass
+def MovAvg(DataIn, SmoothNum):
+    if SmoothNum!=math.floor(SmoothNum):
+        raise SmoothingError('Function cannot accept non-integer filter kernel sizes')
+    if SmoothNum/2==math.floor(SmoothNum/2):
+        SmoothNum-=1
+    if np.shape(DataIn, 1)!=1 and np.shape(DataIn,2)!=1:
+        raise VectorError('MovAvg function can only handle vectors, check inputs')
+    if np.shape(DataIn, 2)==1:
+        DataIn=DataIn`
+        IsCol=True
+    else:
+        IsCol=False
+    
+    DataLength=len(DataIn)
+    FrontPad

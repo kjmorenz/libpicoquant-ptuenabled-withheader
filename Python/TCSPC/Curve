@@ -1,0 +1,65 @@
+class Curve:
+    filetype = 'PHU'
+    FileCreated = -1
+    Measurement_Mode = -1
+    NumberOfCurves = -1
+    BitsPerBin = -1
+    BinningFactor = -1
+    AcqTime = -1
+    TimeLog = ""
+    TimeFrom = -1
+    TimeTo = -1
+    CountFrom = -1
+    CountTo = -1
+    Res = -1
+    InputChannels = -1
+    ExternalRefClock = ""
+    HWSyncDivider = -1
+    SyncCFDLevel = -1
+    SyncCFDZeroCross = -1
+    SyncOffset = -1
+    ChannelOneCFD = -1
+    ChannelOneZeroCross = -1
+    ChannelOneOffset = -1
+    Chan1Enable = ""
+    ChannelTwoCFD = -1
+    ChannelTwoZeroCross = -1
+    ChannelTwoOffset = -1
+    Chan2Enable = ""
+    ResUsed = -1
+    NumBins = -1
+    SyncRate = -1
+    IntegralCountChanOne = -1
+    IntegralCountChanTwo = -1
+    HistResDscr_CurveIndex = -1
+    HistResDscr_MDescResolution = -1
+    HistResDscr_HistogramBins = -1
+    Peak = -1 #max of counts
+    HistResDscr_IntegralCount = -1
+
+    counts = []
+
+    textFileLine = ""
+    sample = -1
+    run = -1
+
+    #sample-run - person-date-somenumber-emwavelength-material=>solvent<filter>expwr-exwavelength-freqofsomekind(detectorID)
+    def getTimeVector(self):
+        time = []
+        for i in range(self.NumBins):
+            time.append(i*self.Res) # do I want Res or ResUsed?
+            
+        return time
+
+    def __init__(self, txtFileLine, datacounts):
+        self.textFileLine = txtFileLine
+        if self.textFileLine != "":#Parsing text file line
+            self.sample = self.textFileLine[0:2]
+            self.run = self.textFileLine[3:5]
+
+        for i in range(len(datacounts)):
+            self.counts.append(datacounts[i]
+        
+    #def textFileParsing
+
+
