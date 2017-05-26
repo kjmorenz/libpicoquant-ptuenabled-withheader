@@ -20,102 +20,13 @@
 #include  <stdlib.h>
 #include  <time.h>
 
-// some important Tag Idents (TagHead.Ident) that we will need to read the most common content of a PTU file
+// some important Tag Idents (TTagHead.Ident) that we will need to read the most common content of a PTU file
 // check the output of this program and consult the tag dictionary if you need more
 #define TTTRTagTTTRRecType "TTResultFormat_TTTRRecType"
 #define TTTRTagNumRecords  "TTResult_NumberOfRecords"  // Number of TTTR Records in the File;
 #define TTTRTagRes         "MeasDesc_Resolution"       // Resolution for the Dtime (T3 Only)
 #define TTTRTagGlobRes     "MeasDesc_GlobalResolution" // Global Resolution of TimeTag(T2) /NSync (T3)
 #define FileTagEnd         "Header_End"                // Always appended as last tag (BLOCKEND)
-
-// The rest of the Tag Idents: We do this so that if the name in the header given changes, you only 
-// need to change it up here, not in the rest of the code
-#define File_GUID "File_GUID" //tyAnsiString
-#define File_AssuredContent "File_AssuredContent" //tyAnsiString
-#define CreatorSW_ContentVersion "CreatorSW_ContentVersion" //tyAnsiString
-#define CreatorSW_Name "CreatorSW_Name" //tyAnsiString 
-#define CreatorSW_Version "CreatorSW_Version" //tyAnsiString
-#define File_CreatingTime "File_CreatingTime" //tyTDateTime
-#define File_Comment "File_Comment" //tyAnsiString
-#define Measurement_Mode "Measurement_Mode" //tyInt8
-#define Measurement_SubMode "Measurement_SubMode" //tyInt8
-#define TTResult_StopReason "TTResult_StopReason" //tyInt8
-#define Fast_Load_End "Fast_Load_End" //empty tag?
-
-#define TTResultFormat_BitsPerRecord "TTResultFormat_BitsPerRecord" //tyInt8
-#define MeasDesc_BinningFactor "" //tyInt8
-#define MeasDesc_Offset "" //tyInt8
-#define MeasDesc_AcquisitionTime "" //tyInt8
-#define MeasDesc_StopAt "" //tyInt8
-#define MeasDesc_StopOnOvfl "" //tyBool8
-#define MeasDesc_Restart "" //tyBool8
-#define CurSWSetting_DispLog "" //tyBool8
-#define CurSWSetting_DispAxisTimeFrom "" //tyInt8
-#define CurSWSetting_DispAxisTimeTo "" //tyInt8
-#define CurSWSetting_DispAxisCountFrom "" //tyInt8
-#define CurSWSetting_DispAxisCountTo "" //tyInt8
-#define CurSWSetting_DispCurves "" //tyInt8
-#define CurSWSetting_DispCurve_MapTo0 "" //tyInt8
-#define CurSWSetting_DispCurve_Show0 "" //tyBool8
-#define CurSWSetting_DispCurve_MapTo1 "" //tyInt8
-#define CurSWSetting_DispCurve_Show1 "" //tyBool8
-#define CurSWSetting_DispCurve_MapTo2 "" //tyInt8
-#define CurSWSetting_DispCurve_Show2 "" //tyBool8
-#define CurSWSetting_DispCurve_MapTo3 "" //tyInt8
-#define CurSWSetting_DispCurve_Show3 "" //tyBool8
-#define CurSWSetting_DispCurve_MapTo4 "" //tyInt8
-#define CurSWSetting_DispCurve_Show4 "" //tyBool8
-#define CurSWSetting_DispCurve_MapTo5 "" //tyInt8
-#define CurSWSetting_DispCurve_Show5 "" //tyBool8
-#define CurSWSetting_DispCurve_MapTo6 "" //tyInt8
-#define CurSWSetting_DispCurve_Show6 "" //tyBool8
-#define CurSWSetting_DispCurve_MapTo7 "" //tyInt8
-#define CurSWSetting_DispCurve_Show7 "" //tyBool8
-#define HW_Type "" //tyAnsiString
-#define HW_PartNo "" //tyAnsiString
-#define HW_Version "" //tyAnsiString
-#define HW_SerialNo "" //tyAnsiString
-#define HW_Modules "" //tyInt8
-#define HWModule_TypeCode0 "" //tyInt8
-#define HWModule_VersCode0 "" //tyInt8
-#define HWModule_TypeCode1 "" //tyInt8
-#define HWModule_VersCode1 "" //tyInt8
-#define HWModule_TypeCode2 "" //tyInt8
-#define HWModule_VersCode2 "" //tyInt8
-#define HW_BaseResolution "" //tyFloat8
-#define HW_InpChannels "" //tyInt8
-#define HW_ExternalRefClock "" //tyBool8
-#define HW_ExternalDevices "" //tyInt8
-#define HWSync_Divider "" //tyInt8
-#define HWSync_CFDLevel "" //tyInt8
-#define HWSync_CFDZeroCross "" //tyInt8
-#define HWSync_Offset "" //tyInt8
-#define HWInpChan_ModuleIdx0 "" //tyInt8
-#define HWInpChan_CFDLevel0 "" //tyInt8
-#define HWInpChan_CFDZeroCross0 "" //tyInt8
-#define HWInpChan_Offset0 "" //tyInt8
-#define HWInpChan_Enabled0 "" //tyBool8
-#define HWInpChan_ModuleIdx1 "" //tyInt8
-#define HWInpChan_CFDLevel1 "" //tyInt8
-#define HWInpChan_CFDZeroCross1 "" //tyInt8
-#define HWInpChan_Offset1 "" //tyInt8
-#define HWInpChan_Enabled1 "" //tyBool8
-
-#define HW_Markers "" //tyInt8
-#define HWMarkers_RisingEdge0 "" //tyBool8
-#define HWMarkers_RisingEdge1 "" //tyBool8
-#define HWMarkers_RisingEdge2 "" //tyBool8
-#define HWMarkers_RisingEdge3 "" //tyBool8
-#define HWMarkers_Enabled0 "" //tyBool8
-#define HWMarkers_Enabled1 "" //tyBool8
-#define HWMarkers_Enabled2 "" //tyBool8
-#define HWMarkers_Enabled3 "" //tyBool8
-#define WMarkers_HoldOff "" //tyInt8
-
-#define TTResult_SyncRate "" //tyInt8
-#define TTResult_InputRate0 "" //tyInt8
-#define TTResult_InputRate1 "" //tyInt8
-#define TTResult_StopAfter
 
 // TagTypes  (TTagHead.Typ)
 #define tyEmpty8      0xFFFF0008
@@ -449,7 +360,7 @@ int main(int argc, char* argv[])
    printf("usage: ht2demo infile oufile\n");
    printf("infile is a Unified TTTR ptu file (binary)\n");
    printf("outfile is ASCII\n");
-   getch();
+   _getch();
    exit(-1);
   }
   if((fpin=fopen(argv[1],"rb"))==NULL)
@@ -504,41 +415,35 @@ int main(int argc, char* argv[])
     fprintf(fpout, "\n%-40s", Buffer);
     switch (TagHead.Typ)
     {
-      case tyEmpty8:
+        case tyEmpty8:
         fprintf(fpout, "<empty Tag>");
         break;
       case tyBool8:
         fprintf(fpout, "%s", bool(TagHead.TagValue)?"True":"False");
-        fprintf(fpout, "  tyBool8");
         break;
       case tyInt8:
         fprintf(fpout, "%lld", TagHead.TagValue);
-        fprintf(fpout, "  tyInt8");
         // get some Values we need to analyse records
         if (strcmp(TagHead.Ident, TTTRTagNumRecords)==0) // Number of records
-          NumRecords = TagHead.TagValue;
+                    NumRecords = TagHead.TagValue;
         if (strcmp(TagHead.Ident, TTTRTagTTTRRecType)==0) // TTTR RecordType
-          RecordType = TagHead.TagValue;
+                    RecordType = TagHead.TagValue;
         break;
       case tyBitSet64:
         fprintf(fpout, "0x%16.16X", TagHead.TagValue);
-        fprintf(fpout, "  tyBitSet64");
         break;
       case tyColor8:
         fprintf(fpout, "0x%16.16X", TagHead.TagValue);
-        fprintf(fpout, "  tyColor8");
         break;
       case tyFloat8:
         fprintf(fpout, "%E", *(double*)&(TagHead.TagValue));
-        fprintf(fpout, "  tyFloat8");
         if (strcmp(TagHead.Ident, TTTRTagRes)==0) // Resolution for TCSPC-Decay
-          Resolution = *(double*)&(TagHead.TagValue);
+                    Resolution = *(double*)&(TagHead.TagValue);
         if (strcmp(TagHead.Ident, TTTRTagGlobRes)==0) // Global resolution for timetag
-          GlobRes = *(double*)&(TagHead.TagValue); // in ns
+                    GlobRes = *(double*)&(TagHead.TagValue); // in ns
         break;
       case tyFloat8Array:
         fprintf(fpout, "<Float Array with %d Entries>", TagHead.TagValue / sizeof(double));
-        fprintf(fpout, "  tyFloat8Array");
         // only seek the Data, if one needs the data, it can be loaded here
         fseek(fpin, (long)TagHead.TagValue, SEEK_CUR);
         break;
@@ -546,35 +451,33 @@ int main(int argc, char* argv[])
         time_t CreateTime;
         CreateTime = TDateTime_TimeT(*((double*)&(TagHead.TagValue)));
         fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
-        fprintf(fpout, "  tyTDateTime");
         break;
       case tyAnsiString:
         AnsiBuffer = (char*)calloc((size_t)TagHead.TagValue,1);
-        Result = fread(AnsiBuffer, 1, (size_t)TagHead.TagValue, fpin);
-        if (Result!= TagHead.TagValue){
+                Result = fread(AnsiBuffer, 1, (size_t)TagHead.TagValue, fpin);
+              if (Result!= TagHead.TagValue)
+        {
           printf("\nIncomplete File.");
           free(AnsiBuffer);
-          goto close;
+                  goto close;
         }
         fprintf(fpout, "%s", AnsiBuffer);
-        fprintf(fpout, "  tyAnsiString");
         free(AnsiBuffer);
         break;
-      case tyWideString:
+            case tyWideString:
         WideBuffer = (WCHAR*)calloc((size_t)TagHead.TagValue,1);
-        Result = fread(WideBuffer, 1, (size_t)TagHead.TagValue, fpin);
-        if (Result!= TagHead.TagValue){
+                Result = fread(WideBuffer, 1, (size_t)TagHead.TagValue, fpin);
+              if (Result!= TagHead.TagValue)
+        {
           printf("\nIncomplete File.");
           free(WideBuffer);
-          goto close;
+                  goto close;
         }
-        //fwprintf(fpout, L"%s", WideBuffer);
-        fprintf(fpout, "  tyWideString");
+        fwprintf(fpout, L"%s", WideBuffer);
         free(WideBuffer);
         break;
-      case tyBinaryBlob:
+            case tyBinaryBlob:
         fprintf(fpout, "<Binary Blob contains %d Bytes>", TagHead.TagValue);
-        fprintf(fpout, "  tyBinaryBlob");
         // only seek the Data, if one needs the data, it can be loaded here
         fseek(fpin, (long)TagHead.TagValue, SEEK_CUR);
         break;
