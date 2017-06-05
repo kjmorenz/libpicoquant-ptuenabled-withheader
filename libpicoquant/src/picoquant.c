@@ -54,7 +54,7 @@ int pq_dispatch(FILE *stream_in, FILE *stream_out, options_t *options) {
 
 	/* Do the actual work, if we have no errors. */
 	result = pq_header_read(stream_in, &pq_header);//replace this to return dispatch 
-	// make it handle ptu
+	// make it handle ptu --> decided to leave this, let it recognize ptu magic
 
 	if ( result ) {
 		error("Could not read string header.\n");
@@ -63,7 +63,7 @@ int pq_dispatch(FILE *stream_in, FILE *stream_out, options_t *options) {
 		if ( dispatch == NULL ) {
 			error("Could not identify board %s.\n", pq_header.Ident, pq_header.Version, ftell);//changed
 			//trying to find out if after original bit we're in the right place to start using the ptu
-			//header read
+			//header read 
 		} else {
 			result = dispatch(stream_in, stream_out, 
 					&pq_header, options);

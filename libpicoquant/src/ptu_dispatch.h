@@ -32,7 +32,14 @@
 #include <stdio.h>
 #include "picoquant.h"
 
-// TagTypes  (TTagHead.Typ)
+#include  <windows.h>
+#include  <ncurses.h>
+
+#include  <stddef.h>
+#include  <stdlib.h>
+#include  <time.h>
+
+// TagTypes  (TagHead.Typ)
 #define tyEmpty8      0xFFFF0008
 #define tyBool8       0x00000008
 #define tyInt8        0x10000008
@@ -56,6 +63,103 @@
 #define rtTimeHarp260NT2 0x00010205    // (SubID = $00 ,RecFmt: $01) (V2), T-Mode: $02 (T2), HW: $05 (TimeHarp260N)
 #define rtTimeHarp260PT3 0x00010306    // (SubID = $00 ,RecFmt: $01) (V1), T-Mode: $02 (T3), HW: $06 (TimeHarp260P)
 #define rtTimeHarp260PT2 0x00010206    // (SubID = $00 ,RecFmt: $01) (V1), T-Mode: $02 (T2), HW: $06 (TimeHarp260P)
+
+// some important Tag Idents (TagHead.Ident) that we will need to read the most common content of a PTU file
+// check the output of this program and consult the tag dictionary if you need more
+#define TTResultFormat_TTTRRecType "TTResultFormat_TTTRRecType"
+#define TTResult_NumberOfRecords  "TTResult_NumberOfRecords"  // Number of TTTR Records in the File;
+#define MeasDesc_Resolution         "MeasDesc_Resolution"       // Resolution for the Dtime (T3 Only)
+#define MeasDesc_GlobalResolution     "MeasDesc_GlobalResolution" // Global Resolution of TimeTag(T2) /NSync (T3)
+#define Header_End         "Header_End"                // Always appended as last tag (BLOCKEND)
+
+// The rest of the Tag Idents: We do this so that if the name in the header given changes, you only 
+// need to change it up here, not in the rest of the code
+#define File_GUID "File_GUID" //tyAnsiString
+#define File_AssuredContent "File_AssuredContent" //tyAnsiString
+#define CreatorSW_ContentVersion "CreatorSW_ContentVersion" //tyAnsiString
+#define CreatorSW_Name "CreatorSW_Name" //tyAnsiString 
+#define CreatorSW_Version "CreatorSW_Version" //tyAnsiString
+#define File_CreatingTime "File_CreatingTime" //tyTDateTime
+#define File_Comment "File_Comment" //tyAnsiString
+#define Measurement_Mode "Measurement_Mode" //tyInt8
+#define Measurement_SubMode "Measurement_SubMode" //tyInt8
+#define TTResult_StopReason "TTResult_StopReason" //tyInt8
+#define Fast_Load_End "Fast_Load_End" //empty tag?
+
+#define TTResultFormat_BitsPerRecord "TTResultFormat_BitsPerRecord" //tyInt8
+#define MeasDesc_BinningFactor "MeasDesc_BinningFactor" //tyInt8
+#define MeasDesc_Offset "MeasDesc_Offset" //tyInt8
+#define MeasDesc_AcquisitionTime "MeasDesc_AcquisitionTime" //tyInt8
+#define MeasDesc_StopAt "MeasDesc_StopAt" //tyInt8
+#define MeasDesc_StopOnOvfl "MeasDesc_StopOnOvfl" //tyBool8
+#define MeasDesc_Restart "MeasDesc_Restart" //tyBool8
+#define CurSWSetting_DispLog "CurSWSetting_DispLog" //tyBool8
+#define CurSWSetting_DispAxisTimeFrom "CurSWSetting_DispAxisTimeFrom" //tyInt8
+#define CurSWSetting_DispAxisTimeTo "CurSWSetting_DispAxisTimeTo" //tyInt8
+#define CurSWSetting_DispAxisCountFrom "CurSWSetting_DispAxisCountFrom" //tyInt8
+#define CurSWSetting_DispAxisCountTo "CurSWSetting_DispAxisCountTo" //tyInt8
+#define CurSWSetting_DispCurves "CurSWSetting_DispCurves" //tyInt8
+#define CurSWSetting_DispCurve_MapTo0 "CurSWSetting_DispCurve_MapTo(0)" //tyInt8
+#define CurSWSetting_DispCurve_Show0 "CurSWSetting_DispCurve_Show(0)" //tyBool8
+#define CurSWSetting_DispCurve_MapTo1 "CurSWSetting_DispCurve_MapTo(1)" //tyInt8
+#define CurSWSetting_DispCurve_Show1 "CurSWSetting_DispCurve_Show(1)" //tyBool8
+#define CurSWSetting_DispCurve_MapTo2 "CurSWSetting_DispCurve_MapTo(2)" //tyInt8
+#define CurSWSetting_DispCurve_Show2 "CurSWSetting_DispCurve_Show(2)" //tyBool8
+#define CurSWSetting_DispCurve_MapTo3 "CurSWSetting_DispCurve_MapTo(3)" //tyInt8
+#define CurSWSetting_DispCurve_Show3 "CurSWSetting_DispCurve_Show(3)" //tyBool8
+#define CurSWSetting_DispCurve_MapTo4 "CurSWSetting_DispCurve_MapTo(4)" //tyInt8
+#define CurSWSetting_DispCurve_Show4 "CurSWSetting_DispCurve_Show(4)" //tyBool8
+#define CurSWSetting_DispCurve_MapTo5 "CurSWSetting_DispCurve_MapTo(5)" //tyInt8
+#define CurSWSetting_DispCurve_Show5 "CurSWSetting_DispCurve_Show(5)" //tyBool8
+#define CurSWSetting_DispCurve_MapTo6 "CurSWSetting_DispCurve_MapTo(6)" //tyInt8
+#define CurSWSetting_DispCurve_Show6 "CurSWSetting_DispCurve_Show(6)" //tyBool8
+#define CurSWSetting_DispCurve_MapTo7 "CurSWSetting_DispCurve_MapTo(7)" //tyInt8
+#define CurSWSetting_DispCurve_Show7 "CurSWSetting_DispCurve_Show(7)" //tyBool8
+#define HW_Type "HW_Type" //tyAnsiString
+#define HW_PartNo "HW_PartNo" //tyAnsiString
+#define HW_Version "HW_Version" //tyAnsiString
+#define HW_SerialNo "HW_SerialNo" //tyAnsiString
+#define HW_Modules "HW_Modules" //tyInt8
+#define HWModule_TypeCode0 "HWModule_TypeCode(0)" //tyInt8
+#define HWModule_VersCode0 "HWModule_VersCode(0)" //tyInt8
+#define HWModule_TypeCode1 "HWModule_TypeCode(1)" //tyInt8
+#define HWModule_VersCode1 "HWModule_VersCode(1)" //tyInt8
+#define HWModule_TypeCode2 "HWModule_TypeCode(2)" //tyInt8
+#define HWModule_VersCode2 "HWModule_VersCode(2)" //tyInt8
+#define HW_BaseResolution "HW_BaseResolution" //tyFloat8
+#define HW_InpChannels "HW_InpChannels" //tyInt8
+#define HW_ExternalRefClock "HW_ExternalRefClock" //tyBool8
+#define HW_ExternalDevices "HW_ExternalDevices" //tyInt8
+#define HWSync_Divider "HWSync_Divider" //tyInt8
+#define HWSync_CFDLevel "HWSync_CFDLevel" //tyInt8
+#define HWSync_CFDZeroCross "HWSync_CFDZeroCross" //tyInt8
+#define HWSync_Offset "HWSync_Offset" //tyInt8
+#define HWInpChan_ModuleIdx0 "HWInpChan_ModuleIdx(0)" //tyInt8
+#define HWInpChan_CFDLevel0 "HWInpChan_CFDLevel(0)" //tyInt8
+#define HWInpChan_CFDZeroCross0 "HWInpChan_CFDZeroCross(0)" //tyInt8
+#define HWInpChan_Offset0 "HWInpChan_Offset(0)" //tyInt8
+#define HWInpChan_Enabled0 "HWInpChan_Enabled(0)" //tyBool8
+#define HWInpChan_ModuleIdx1 "HWInpChan_ModuleIdx(1)" //tyInt8
+#define HWInpChan_CFDLevel1 "HWInpChan_CFDLevel(1)" //tyInt8
+#define HWInpChan_CFDZeroCross1 "HWInpChan_CFDZeroCross(1)" //tyInt8
+#define HWInpChan_Offset1 "HWInpChan_Offset(1)" //tyInt8
+#define HWInpChan_Enabled1 "HWInpChan_Enabled(1)" //tyBool8
+
+#define HW_Markers "HW_Markers" //tyInt8
+#define HWMarkers_RisingEdge0 "HWMarkers_RisingEdge(0)" //tyBool8
+#define HWMarkers_RisingEdge1 "HWMarkers_RisingEdge(1)" //tyBool8
+#define HWMarkers_RisingEdge2 "HWMarkers_RisingEdge(2)" //tyBool8
+#define HWMarkers_RisingEdge3 "HWMarkers_RisingEdge(3)" //tyBool8
+#define HWMarkers_Enabled0 "HWMarkers_Enabled(0)" //tyBool8
+#define HWMarkers_Enabled1 "HWMarkers_Enabled(1)" //tyBool8
+#define HWMarkers_Enabled2 "HWMarkers_Enabled(2)" //tyBool8
+#define HWMarkers_Enabled3 "HWMarkers_Enabled(3)" //tyBool8
+#define WMarkers_HoldOff "HWMarkers_HoldOff" //tyInt8
+
+#define TTResult_SyncRate "TTResult_SyncRate" //tyInt8
+#define TTResult_InputRate0 "TTResult_InputRate(0)" //tyInt8
+#define TTResult_InputRate1 "TTResult_InputRate(1)" //tyInt8
+#define TTResult_StopAfter "TTResult_StopAfter" //tyInt8
 
 // A Tag entry
 typedef struct {
@@ -121,5 +225,9 @@ typedef struct {
 
 int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header,
 		options_t *options);
+
+time_t TDateTime_TimeT(double Convertee);
+
+void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) ;
 
 #endif

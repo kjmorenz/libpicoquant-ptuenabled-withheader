@@ -48,6 +48,15 @@
 
 #include "error.h"
 
+//from ptu demo:
+#include  <windows.h>
+#include  <ncurses.h>
+#include  <stdio.h>
+
+#include  <stddef.h>
+#include  <stdlib.h>
+#include  <time.h>
+
 FILE *fpin,*fpout;
 bool IsT2;
 long long RecNum;
@@ -67,6 +76,17 @@ void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) {
 	tttr->sync_rate = tttr_header->SyncRate;
 	tttr->resolution_float = HH_BASE_RESOLUTION;
 	tttr->resolution_int = floor(fabs(tttr->resolution_float*1e12));
+}
+
+// TDateTime (in file) to time_t (standard C) conversion
+
+
+
+time_t TDateTime_TimeT(double Convertee){
+    const int EpochDiff = 25569; // days between 30/12/1899 and 01/01/1970
+    const int SecsInDay = 86400; // number of seconds in a day
+    time_t Result((long)(((Convertee) - EpochDiff) * SecsInDay));
+    return Result;
 }
 
 int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header, 
@@ -124,92 +144,263 @@ ptu_header_t ptu_header_parse(FILE *in_stream, File *out_stream){
     strcpy(Buffer, TagHead.Ident);
     if (TagHead.Idx > -1)
     {
-      sprintf(Buffer, "%s(%d)", TagHead.Ident,TagHead.Idx);//puts formatted output into buffer
+      sprintf(Buffer, "%s(%d)", TagHead.Ident,TagHead.Idx);
     }
     fprintf(fpout, "\n%-40s", Buffer);
     switch (TagHead.Typ)
     {
       case tyEmpty8:
-        fprintf(fpout, "<empty Tag>");
+        if (strcmp(TagHead.Ident, FastLoadEnd)==0){
+          ptu_header.Fast_Load_End = TagHead.TagValue ;//just kept everything  
+        }
+        //fprintf(fpout, "<empty Tag>");
         break;
       case tyBool8:
-        fprintf(fpout, "%s", bool(TagHead.TagValue)?"True":"False");
-        fprintf(fpout, "  tyBool8");
+        if (strcmp(TagHead.Ident, MeasDesc_StopOnOvfl)==0){
+          ptu_header.MeasDesc_StopOnOvfl = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, MeasDesc_Restart)==0){
+          ptu_header.MeasDesc_Restart = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispLog)==0){
+          ptu_header.CurSWSetting_DispLog = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_Show0)==0){
+          ptu_header.CurSWSetting_DispCurve_Show0 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_Show1)==0){
+          ptu_header.CurSWSetting_DispCurve_Show1 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_Show2)==0){
+          ptu_header.CurSWSetting_DispCurve_Show2 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_Show3)==0){
+          ptu_header.CurSWSetting_DispCurve_Show3 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_Show4)==0){
+          ptu_header.CurSWSetting_DispCurve_Show4 = TagHead.TagValue  ; 
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_Show5)==0){
+          ptu_header.CurSWSetting_DispCurve_Show5 = TagHead.TagValue   
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_Show6)==0){
+          ptu_header.CurSWSetting_DispCurve_Show6 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_Show7)==0){
+          ptu_header.CurSWSetting_DispCurve_Show7 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, HW_ExternalRefClock)==0){
+          ptu_header.HW_ExternalRefClock = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, HWInpChan_Enabled0==0){
+          ptu_header.HWInpChan_Enabled0 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, HWInpChan_Enabled1==0){
+          ptu_header.HWInpChan_Enabled1 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, HWMarkers_RisingEdge0==0){
+          ptu_header.HWMarkers_RisingEdge0 = TagHead.TagValue  ; 
+        } else if (strcmp(TagHead.Ident, HWMarkers_RisingEdge1==0){
+          ptu_header.HWMarkers_RisingEdge1 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, HWMarkers_RisingEdge2==0){
+          ptu_header.HWMarkers_RisingEdge2 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, HWMarkers_RisingEdge3==0){
+          ptu_header.HWMarkers_RisingEdge3 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, HWMarkers_Enabled0==0){
+          ptu_header.HWMarkers_Enabled0 = TagHead.TagValue  ; 
+        } else if (strcmp(TagHead.Ident, HWMarkers_Enabled1==0){
+          ptu_header.HWMarkers_Enabled1 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, HWMarkers_Enabled2==0){
+          ptu_header.HWMarkers_Enabled2 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, HWMarkers_Enabled3==0){
+          ptu_header.HWMarkers_Enabled3 = TagHead.TagValue;   
+        }
+        //fprintf(fpout, "%s", bool(TagHead.TagValue)?"True":"False");
+        //fprintf(fpout, "  tyBool8");
         break;
       case tyInt8:
-        fprintf(fpout, "%lld", TagHead.TagValue);
+        if (strcmp(TagHead.Ident, Measurement_Mode)==0){
+          ptu_header.Measurement_Mode = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, Measurement_SubMode)==0){
+          ptu_header.Measurement_SubMode = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, TTResult_StopReason)==0){
+          ptu_header.TTResult_StopReason = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, TTResultFormat_TTTRRecType)==0){
+          ptu_header.TTResultFormat_TTTRRecType = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, TTResultFormat_BitsPerRecord)==0){
+          ptu_header.TTResultFormat_BitsPerRecord = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, MeasDesc_BinningFactor)==0){
+          ptu_header.MeasDesc_BinningFactor = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, MeasDesc_Offset)==0){
+          ptu_header.MeasDesc_Offset = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, MeasDesc_AcquisitionTime)==0){
+          ptu_header.MeasDesc_AcquisitionTime = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, MeasDesc_StopAt)==0){
+          ptu_header.MeasDesc_StopAt = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispAxisTimeFrom)==0){
+          ptu_header.CurSWSetting_DispAxisTimeFrom = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispAxisTimeTo)==0){
+          ptu_header.CurSWSetting_DispAxisTimeTo = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispAxisCountFrom)==0){
+          ptu_header.CurSWSetting_DispAxisCountFrom = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispAxisCountTo)==0){
+          ptu_header.CurSWSetting_DispAxisCountTo = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurves)==0){
+          ptu_header.CurSWSetting_DispCurves = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_MapTo0)==0){
+          ptu_header.CurSWSetting_DispCurve_MapTo0 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_MapTo1)==0){
+          ptu_header.CurSWSetting_DispCurve_MapTo1 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_MapTo2)==0){
+          ptu_header.CurSWSetting_DispCurve_MapTo2 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_MapTo3)==0){
+          ptu_header.CurSWSetting_DispCurve_MapTo3 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_MapTo4)==0){
+          ptu_header.CurSWSetting_DispCurve_MapTo4 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_MapTo5)==0){
+          ptu_header.CurSWSetting_DispCurve_MapTo5 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_MapTo6)==0){
+          ptu_header.CurSWSetting_DispCurve_MapTo6 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CurSWSetting_DispCurve_MapTo7)==0){
+          ptu_header.CurSWSetting_DispCurve_MapTo7 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HW_Modules )==0){
+          ptu_header.HW_Modules  = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWModule_TypeCode0)==0){
+          ptu_header.HWModule_TypeCode0 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWModule_TypeCode1)==0){
+          ptu_header.HWModule_TypeCode1 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWModule_TypeCode2)==0){
+          ptu_header.HWModule_TypeCode2 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWModule_VersCode0)==0){
+          ptu_header.HWModule_VersCode0 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWModule_VersCode1)==0){
+          ptu_header.HWModule_VersCode1 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWModule_VersCode2)==0){
+          ptu_header.HWModule_VersCode2 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HW_InpChannels)==0){
+          ptu_header.HW_InpChannels = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HW_ExternalDevices)==0){
+          ptu_header.HW_ExternalDevices = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWSync_Divider)==0){
+          ptu_header.HWSync_Divider = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWSync_CFDLevel)==0){
+          ptu_header.HWSync_CFDLevel = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWSync_CFDZeroCross)==0){
+          ptu_header.HWSync_CFDZeroCross = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWSync_Offset)==0){
+          ptu_header.HWSync_Offset = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWInpChan_ModuleIdx0)==0){
+          ptu_header.HWInpChan_ModuleIdx0 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWInpChan_ModuleIdx1)==0){
+          ptu_header.HWInpChan_ModuleIdx1 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWInpChan_CFDLevel0)==0){
+          ptu_header.HWInpChan_CFDLevel0 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWInpChan_CFDLevel1)==0){
+          ptu_header.HWInpChan_CFDLevel1 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWInpChan_CFDZeroCross0)==0){
+          ptu_header.HWInpChan_CFDZeroCross0 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWInpChan_CFDZeroCross1)==0){
+          ptu_header.HWInpChan_CFDZeroCross1 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWInpChan_Offset0)==0){
+          ptu_header.HWInpChan_Offset0 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWInpChan_Offset1)==0){
+          ptu_header.HWInpChan_Offset1 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HW_Markers)==0){
+          ptu_header.HW_Markers = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HWMarkers_HoldOff )==0){
+          ptu_header.HWMarkers_HoldOff = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, TTResult_SyncRate)==0){
+          ptu_header.TTResult_SyncRate = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, TTResult_InputRate0)==0){
+          ptu_header.TTResult_InputRate0 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, TTResult_InputRate1)==0){
+          ptu_header.TTResult_InputRate1 = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, TTResult_StopAfter)==0){
+          ptu_header.TTResult_StopAfter = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, TTResult_NumberOfRecords)==0){
+          ptu_header.TTResult_NumberOfRecords = TagHead.TagValue;
+        }
+        /*fprintf(fpout, "%lld", TagHead.TagValue);
         fprintf(fpout, "  tyInt8");
         // get some Values we need to analyse records
         if (strcmp(TagHead.Ident, TTTRTagNumRecords)==0) // Number of records
           NumRecords = TagHead.TagValue;
         if (strcmp(TagHead.Ident, TTTRTagTTTRRecType)==0) // TTTR RecordType
-          RecordType = TagHead.TagValue;
+          RecordType = TagHead.TagValue;*/ 
         break;
-      case tyBitSet64:
-        fprintf(fpout, "0x%16.16X", TagHead.TagValue);
-        fprintf(fpout, "  tyBitSet64");
-        break;
-      case tyColor8:
+      /*case tyBitSet64: //not sure when this is used
+        //fprintf(fpout, "0x%16.16X", TagHead.TagValue);
+        //fprintf(fpout, "  tyBitSet64");
+        break;*/
+      /*case tyColor8:
         fprintf(fpout, "0x%16.16X", TagHead.TagValue);
         fprintf(fpout, "  tyColor8");
-        break;
+        break;*/
       case tyFloat8:
+        if (strcmp(TagHead.Ident, HW_BaseResolution)==0){ //this one probs not needed
+          ptu_header.HW_BaseResolution = *(double*)&(TagHead.TagValue);   
+        } else if (strcmp(TagHead.Ident, MeasDesc_Resolution)==0){
+          ptu_header.MeasDesc_Resolution = *(double*)&(TagHead.TagValue);
+        } else if (strcmp(TagHead.Ident, MeasDesc_GlobalResolution)==0){
+          ptu_header.MeasDesc_GlobalResolution = *(double*)&(TagHead.TagValue);//in ns
+        }/*
         fprintf(fpout, "%E", *(double*)&(TagHead.TagValue));
         fprintf(fpout, "  tyFloat8");
         if (strcmp(TagHead.Ident, TTTRTagRes)==0) // Resolution for TCSPC-Decay
           Resolution = *(double*)&(TagHead.TagValue);
         if (strcmp(TagHead.Ident, TTTRTagGlobRes)==0) // Global resolution for timetag
-          GlobRes = *(double*)&(TagHead.TagValue); // in ns
+          GlobRes = *(double*)&(TagHead.TagValue); // in ns*/
         break;
-      case tyFloat8Array:
+      /*case tyFloat8Array: //is this used when there are multiple records in one file?
         fprintf(fpout, "<Float Array with %d Entries>", TagHead.TagValue / sizeof(double));
         fprintf(fpout, "  tyFloat8Array");
         // only seek the Data, if one needs the data, it can be loaded here
         fseek(fpin, (long)TagHead.TagValue, SEEK_CUR);
-        break;
+        break;*/
       case tyTDateTime:
         time_t CreateTime;
-        CreateTime = TDateTime_TimeT(*((double*)&(TagHead.TagValue)));
-        fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
-        fprintf(fpout, "  tyTDateTime");
+        ptu_header.File_CreatingTime = TDateTime_TimeT(*((double*)&(TagHead.TagValue)));
+        //fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
+        //fprintf(fpout, "  tyTDateTime");
         break;
       case tyAnsiString:
         AnsiBuffer = (char*)calloc((size_t)TagHead.TagValue,1);
         Result = fread(AnsiBuffer, 1, (size_t)TagHead.TagValue, fpin);
         if (Result!= TagHead.TagValue){
-          printf("\nIncomplete File.");
-          free(AnsiBuffer);
-          goto close;
+          printf("\nIncomplete File at AnsiBuffer.");
+        } else if (strcmp(TagHead.Ident, File_GUID)==0){
+          ptu_header.File_GUID = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, File_AssuredContent)==0){
+          ptu_header.File_AssuredContent = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CreatorSW_ContentVersion)==0){
+          ptu_header.CreatorSW_ContentVersion = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CreatorSW_Name)==0){
+          ptu_header.CreatorSW_Name = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, CreatorSW_Version)==0){
+          ptu_header.CreatorSW_Version = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, File_Comment)==0){//T2 Mode!!!!!!!!!
+          ptu_header.File_Comment = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HW_Type)==0){//HydraHarp400!!!!!!!!
+          ptu_header.HW_Type = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HW_PartNo)==0){
+          ptu_header.HW_PartNo = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HW_Version)==0){//Version 2.0!!!!!!!
+          ptu_header.HW_Version = TagHead.TagValue;
+        } else if (strcmp(TagHead.Ident, HW_SerialNo)==0){
+          ptu_header.HW_SerialNo = TagHead.TagValue;
         }
-        fprintf(fpout, "%s", AnsiBuffer);
-        fprintf(fpout, "  tyAnsiString");
+        //fprintf(fpout, "%s", AnsiBuffer);
+        //fprintf(fpout, "  tyAnsiString");
         free(AnsiBuffer);
         break;
-      case tyWideString:
+      /*case tyWideString:
         WideBuffer = (WCHAR*)calloc((size_t)TagHead.TagValue,1);
         Result = fread(WideBuffer, 1, (size_t)TagHead.TagValue, fpin);
         if (Result!= TagHead.TagValue){
-          printf("\nIncomplete File.");
-          free(WideBuffer);
-          goto close;
+          printf("\nIncomplete File at WideBuffer");
         }
         //fwprintf(fpout, L"%s", WideBuffer);
         fprintf(fpout, "  tyWideString");
         free(WideBuffer);
-        break;
-      case tyBinaryBlob:
+        break;*/
+      /*case tyBinaryBlob:
         fprintf(fpout, "<Binary Blob contains %d Bytes>", TagHead.TagValue);
         fprintf(fpout, "  tyBinaryBlob");
         // only seek the Data, if one needs the data, it can be loaded here
         fseek(fpin, (long)TagHead.TagValue, SEEK_CUR);
-        break;
+        break;*/
       default:
-        printf("Illegal Type identifier found! Broken file?");
-        goto close;
+        error  ("Illegal Type identifier found! Broken file?");
+        break;
     }
   }
-  while((strncmp(TagHead.Ident, FileTagEnd, sizeof(FileTagEnd))));
-
+  while((strncmp(TagHead.Ident, Header_End, sizeof(Header_End))));
   return ptu_header
 // End Header loading
 }
@@ -218,6 +409,20 @@ pq_dispatch_t get_recordtype(long long RecordType){ //only hydraharp gives corre
     // TTTR Record type
   switch (RecordType)
   {
+    case rtHydraHarp2T2:
+      return ptu_hh_v20_t2_stream(FILE *stream_in, FILE *stream_out,
+       ptu_header_t *ptu_header, options_t *options) 
+      //fprintf(fpout, "HydraHarp V2 T2 data\n");
+      //fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
+      break;
+    case rtHydraHarp2T3:
+      return ptu_hh_v20_t3_stream(FILE *stream_in, FILE *stream_out,
+       ptu_header_t *ptu_header, options_t *options)
+      //fprintf(fpout, "HydraHarp V2 T3 data\n");
+      //fprintf(fpout,"\nrecord# chan   nsync truetime/ns dtime\n");
+      break;
+    
+    //need to add errors
     case rtPicoHarpT2:
       fprintf(fpout, "PicoHarp T2 data\n");
       fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
@@ -237,16 +442,6 @@ pq_dispatch_t get_recordtype(long long RecordType){ //only hydraharp gives corre
       fprintf(fpout, "HydraHarp V1 T3 data\n");
       fprintf(fpout,"\nrecord# chan   nsync truetime/ns dtime\n");
       return(hh_dispatch);
-      break;
-    case rtHydraHarp2T2:
-      fprintf(fpout, "HydraHarp V2 T2 data\n");
-      fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
-      return(hh_v20_tttr_stream);
-      break;
-    case rtHydraHarp2T3:
-      fprintf(fpout, "HydraHarp V2 T3 data\n");
-      fprintf(fpout,"\nrecord# chan   nsync truetime/ns dtime\n");
-      return(hh_v20_tttr_stream);
       break;
 	case rtTimeHarp260NT3:
       fprintf(fpout, "TimeHarp260N T3 data\n");

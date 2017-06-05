@@ -758,7 +758,7 @@ int main(int argc, char* argv[])
   while((strncmp(TagHead.Ident, Header_End, sizeof(Header_End))));
   fprintf(fpout, "\n-----------------------\n");
 // End Header loading
-
+}
   
   // TTTR Record type
   switch (ptu_header.TTResultFormat_TTTRRecType)
