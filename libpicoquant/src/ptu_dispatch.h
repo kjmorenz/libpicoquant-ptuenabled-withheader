@@ -180,6 +180,83 @@ typedef struct {
 	/* Note that Records is the only difference between interactive and 
 	 * tttr main headers. Interactive calls this BitsPerHistogBin.
 	 */
+
+	 //booleans
+	 MeasDesc_StopOnOvfl;
+	 MeasDesc_Restart; 
+	 CurSWSetting_DispLog;
+	 CurSWSetting_DispCurve_Show0;
+	 CurSWSetting_DispCurve_Show1;
+	 CurSWSetting_DispCurve_Show2; 
+	 CurSWSetting_DispCurve_Show3; 
+	 CurSWSetting_DispCurve_Show4; 
+	 CurSWSetting_DispCurve_Show5;
+	 CurSWSetting_DispCurve_Show6;
+	 CurSWSetting_DispCurve_Show7;
+	 HW_ExternalRefClock;
+	 HWInpChan_Enabled0;
+	 HWInpChan_Enabled1;
+	 HWMarkers_RisingEdge0;
+	 HWMarkers_RisingEdge1;
+	 HWMarkers_RisingEdge2;
+	 HWMarkers_RisingEdge3;
+	 HWMarkers_Enabled0;
+	 HWMarkers_Enabled1;
+	 HWMarkers_Enabled2;
+	 HWMarkers_Enabled3;
+
+	 //int8
+	 Measurement_Mode;
+	 Measurement_SubMode;
+	 TTResult_StopReason;
+	 TTResultFormat_TTTRRecType;
+	 TTResultFormat_BitsPerRecord;
+	 MeasDesc_BinningFactor;
+	 MeasDesc_Offset;
+	 MeasDesc_AcquisitionTime;
+	 MeasDesc_StopAt;
+	 CurSWSetting_DispAxisTimeFrom;
+	 CurSWSetting_DispAxisTimeTo;
+	 CurSWSetting_DispAxisCountFrom;
+	 CurSWSetting_DispAxisCountTo;
+	 CurSWSetting_DispCurves;
+	 CurSWSetting_DispCurve_MapTo0;
+	 CurSWSetting_DispCurve_MapTo1;
+	 CurSWSetting_DispCurve_MapTo2;
+	 CurSWSetting_DispCurve_MapTo3;
+	 CurSWSetting_DispCurve_MapTo4;
+	 CurSWSetting_DispCurve_MapTo5;
+	 CurSWSetting_DispCurve_MapTo6;
+	 CurSWSetting_DispCurve_MapTo7;
+	 HW_Modules;
+	 HWModule_TypeCode0;
+	 HWModule_TypeCode1;
+	 HWModule_TypeCode2;
+	 HWModule_VersCode0;
+	 HWModule_VersCode1;
+	 HWModule_VersCode2;
+	 HW_InpChannels;
+	 HW_ExternalDevices;
+	 HWSync_Divider;
+	 HWSync_CFDLevel;
+	 HWSync_CFDZeroCross;
+	 HWSync_Offset;
+	 HWInpChan_ModuleIdx0;
+	 HWInpChan_ModuleIdx1;
+	 HWInpChan_CFDLevel0;
+	 HWInpChan_CFDLevel1;
+	 HWInpChan_CFDZeroCross0;
+	 HWInpChan_CFDZeroCross1;
+	 HWInpChan_Offset0;
+	 HWInpChan_Offset1;
+	 HW_Markers;
+	 HWMarkers_HoldOff;
+	 TTResult_SyncRate;
+	 TTResult_InputRate0;
+	 TTResult_InputRate1;
+	 TTResult_StopAfter;
+	 TTResult_NumberOfRecords;
+
 	int32_t BitsPerRecord;
 
 	int32_t ActiveCurve;
