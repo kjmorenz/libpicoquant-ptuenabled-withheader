@@ -51,6 +51,12 @@ void pq_header_printf(FILE *stream_out, pq_header_t *pq_header) {
 			(int)sizeof(pq_header->Ident), pq_header->FormatVersion);
 }
 
+
 void pq_header_fwrite(FILE *stream_out, pq_header_t *pq_header) {
+	fwrite(pq_header, sizeof(pq_header_t), 1, stream_out);
+}
+
+void ptu_header_fwrite(FILE *stream_out, ptu_header_t *ptu_header, pq_header_t *pq_header){
+	fwrite(ptu_header, sizeof(ptu_header_t), 1, stream_out);
 	fwrite(pq_header, sizeof(pq_header_t), 1, stream_out);
 }

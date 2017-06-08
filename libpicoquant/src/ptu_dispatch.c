@@ -49,6 +49,8 @@
 
 #include "error.h"
 
+#include "header.h"
+
 //from ptu demo:
 #include  <windows.h>
 #include  <ncurses.h>
@@ -69,15 +71,21 @@ double Resolution = 0.0;
 unsigned int dlen = 0;
 unsigned int cnt_0=0, cnt_1=0;
 
-void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) {
+/*void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) {
 	tttr->sync_channel = ptu_header->InputChannelsPresent;
 	tttr->origin = 0;
 	tttr->overflows = 0;
-	tttr->overflow_increment = HH_T2_OVERFLOW;//NOW THIS ONLY WORKS FOR HH
+  if isT2{
+	  tttr->overflow_increment = HH_T2_OVERFLOW;
+    tttr->resolution_float = HH_BASE_RESOLUTION;
+  } else {
+    tttr->overflow_increment = HH_T3_OVERFLOW;
+    tttr->resolution_float = ptu_header->Resolution*1e-12;
+  }//NOW THIS ONLY WORKS FOR HH
 	tttr->sync_rate = tttr_header->SyncRate;
-	tttr->resolution_float = HH_BASE_RESOLUTION;
+	
 	tttr->resolution_int = floor(fabs(tttr->resolution_float*1e12));
-}
+}*/
 
 // TDateTime (in file) to time_t (standard C) conversion
 
@@ -90,7 +98,7 @@ time_t TDateTime_TimeT(double Convertee){
     return Result;
 }
 
-//NEED TO ADD OPTIONS HANDLING ****************************************************
+
 int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header, 
 		options_t *options) {
 	int result;
@@ -98,18 +106,23 @@ int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header,
     ptu_header = ptu_header_parse(in_stream, out_stream);//check that this is how you should send these
 
     //find hardware
-    decode = get_recordtype(ptu_header->RecordType);//need to define header, record type
+    isT2 = get_recordtype(ptu_header->TTResultFormat_TTTRRecType);//need to define header, record type
+    
     pq_header->FormatVersion = ptu_header.FormatVersion;
     
     //read it!
-    if ( decode == NULL ) {
-		error("Could not identify board %s.\n", pq_header->Ident, pq_header->FormatVersion, ftell);
-    } else if ( isT2) { //need to define isT2?
-        tttr_t tttr;//only for t2?
-        tttr = tttr_init(ptu_header, &tttr);
-		    result = pq_t2_stream(in_stream, out_stream, decode, tttr, options);
+    if ( isT2 == NULL ) {
+		  error("Board is not supported in ptu format: %s.\n", pq_header->Ident, pq_header->FormatVersion, ftell);
+    } else if ( options->print_header ) {
+			if ( options->binary_out ) {
+				ptu_header_fwrite(stream_out, ptu_header);
+			} else {
+				pq_header_printf(stream_out, pq_header);
+			}
+	  } else if ( isT2) { 
+		    result = ptu_hh_V20_t2_stream(*in_stream, *out_stream, *ptu_header, *options);
 	  } else {
-        result = pq_t3_stream(in_stream, out_stream, decode, tttr, options);//also needs fixing
+      result = ptu_hh_V20_t3_stream(*in_stream, *out_stream, *ptu_header, *options);
     }                                     
 
 	return(result);
@@ -130,13 +143,7 @@ ptu_header_t ptu_header_parse(FILE *in_stream, File *out_stream){
   TagHead_t TagHead;
   fseek(in_stream, sizeof(Magic)+sizeof(Version), SEEK_SET);//make sure we start at the right place
   // read tagged header
-  do
-  {
-    // This loop is very generic. It reads all header items and displays the identifier and the
-    // associated value, quite independent of what they mean in detail.
-    // Only some selected items are explicitly retrieved and kept in memory because they are 
-    // needed to subsequently interpret the TTTR record data.
-
+  do{
     Result = fread( &TagHead, 1, sizeof(TagHead) ,fpin);
     if (Result!= sizeof(TagHead))
     {
@@ -407,26 +414,29 @@ ptu_header_t ptu_header_parse(FILE *in_stream, File *out_stream){
 // End Header loading
 }
 
-pq_dispatch_t get_recordtype(long long RecordType){ //only hydraharp gives correct version
+int get_recordtype(int32_t RecordType){ //only hydraharp gives correct version
     // TTTR Record type
   switch (RecordType)
   {
     case rtHydraHarp2T2:
-      isT2 = true;//DOES THIS WORK?
-      return ptu_hh_v20_t2_stream(FILE *stream_in, FILE *stream_out,
-       ptu_header_t *ptu_header, options_t *options) 
+      return true;//DOES THIS WORK?
+      //return ptu_hh_v20_t2_stream(FILE *stream_in, FILE *stream_out,
+      // ptu_header_t *ptu_header, options_t *options) 
       //fprintf(fpout, "HydraHarp V2 T2 data\n");
       //fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
       break;
     case rtHydraHarp2T3:
-      isT2 = false;//DOES THIS WORK?
-      return ptu_hh_v20_t3_stream(FILE *stream_in, FILE *stream_out,
-       ptu_header_t *ptu_header, options_t *options)
+      return false;//DOES THIS WORK?
+      //return ptu_hh_v20_t3_stream(FILE *stream_in, FILE *stream_out,
+      // ptu_header_t *ptu_header, options_t *options)
       //fprintf(fpout, "HydraHarp V2 T3 data\n");
       //fprintf(fpout,"\nrecord# chan   nsync truetime/ns dtime\n");
       break;
     
     //need to add errors
+
+    /*
+    
     //none of the rest of these are set up, only hydraharp
     case rtPicoHarpT2:
       fprintf(fpout, "PicoHarp T2 data\n");
@@ -467,9 +477,9 @@ pq_dispatch_t get_recordtype(long long RecordType){ //only hydraharp gives corre
       fprintf(fpout, "TimeHarp260P T2 data\n");
       fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
       return(th_dispatch);
-      break;
+      break;*/
   default:
-    fprintf(fpout, "Unknown record type: 0x%X\n 0x%X\n ", RecordType);
+    error("Unknown record type: 0x%X\n 0x%X\n ", RecordType);
     return NULL;
   }
   

@@ -46,5 +46,6 @@ typedef struct {
 int pq_header_read(FILE *in_stream, pq_header_t *pq_header);
 void pq_header_printf(FILE *out_stream, pq_header_t *pq_header);
 void pq_header_fwrite(FILE *out_stream, pq_header_t *pq_header);
+void ptu_header_fwrite(FILE *stream_out, ptu_header_t *ptu_header, pq_header_t *pq_header);
 
 #endif 

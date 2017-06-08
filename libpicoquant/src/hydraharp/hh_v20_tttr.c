@@ -263,12 +263,6 @@ ptu_hh_v20_t2_stream(FILE *stream_in, FILE *stream_out,
 		pq_resolution_print(stream_out, -1,
 				tttr.resolution_float*1e12, options);
 		return(PQ_SUCCESS);
-	} else if ( options->print_header ) {
-			if ( options->binary_out ) {
-				pq_header_fwrite(stream_out, ptu_header);
-			} else {
-				pq_header_printf(stream_out, ptu_header);
-			}
 	} else if ( options->print_mode ) {
 			if ( ptu_header->Measurement_Mode == HH_MODE_INTERACTIVE ) {
 				fprintf(stream_out, "interactive\n");
