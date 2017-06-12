@@ -204,28 +204,28 @@ typedef struct {
 	 */
 
 	 //booleans
-	 unsigned int MeasDesc_StopOnOvfl;
-	 unsigned int MeasDesc_Restart; 
-	 unsigned int CurSWSetting_DispLog;
-	 unsigned int CurSWSetting_DispCurve_Show0;
-	 unsigned int CurSWSetting_DispCurve_Show1;
-	 unsigned int CurSWSetting_DispCurve_Show2; 
-	 unsigned int CurSWSetting_DispCurve_Show3; 
-	 unsigned int CurSWSetting_DispCurve_Show4; 
-	 unsigned int CurSWSetting_DispCurve_Show5;
-	 unsigned int CurSWSetting_DispCurve_Show6;
-	 unsigned int CurSWSetting_DispCurve_Show7;
-	 unsigned int HW_ExternalRefClock;
-	 unsigned int HWInpChan_Enabled0;
-	 unsigned int HWInpChan_Enabled1;
-	 unsigned int HWMarkers_RisingEdge0;
-	 unsigned int HWMarkers_RisingEdge1;
-	 unsigned int HWMarkers_RisingEdge2;
-	 unsigned int HWMarkers_RisingEdge3;
-	 unsigned int HWMarkers_Enabled0;
-	 unsigned int HWMarkers_Enabled1;
-	 unsigned int HWMarkers_Enabled2;
-	 unsigned int HWMarkers_Enabled3;
+	 uint32_t MeasDesc_StopOnOvfl;
+	 uint32_t MeasDesc_Restart; 
+	 uint32_t CurSWSetting_DispLog;
+	 uint32_t CurSWSetting_DispCurve_Show0;
+	 uint32_t CurSWSetting_DispCurve_Show1;
+	 uint32_t CurSWSetting_DispCurve_Show2; 
+	 uint32_t CurSWSetting_DispCurve_Show3; 
+	 uint32_t CurSWSetting_DispCurve_Show4; 
+	 uint32_t CurSWSetting_DispCurve_Show5;
+	 uint32_t CurSWSetting_DispCurve_Show6;
+	 uint32_t CurSWSetting_DispCurve_Show7;
+	 uint32_t HW_ExternalRefClock;
+	 uint32_t HWInpChan_Enabled0;
+	 uint32_t HWInpChan_Enabled1;
+	 uint32_t HWMarkers_RisingEdge0;
+	 uint32_t HWMarkers_RisingEdge1;
+	 uint32_t HWMarkers_RisingEdge2;
+	 uint32_t HWMarkers_RisingEdge3;
+	 uint32_t HWMarkers_Enabled0;
+	 uint32_t HWMarkers_Enabled1;
+	 uint32_t HWMarkers_Enabled2;
+	 uint32_t HWMarkers_Enabled3;
 
 	 //int8
 	 int32_t Fast_Load_End;
@@ -344,7 +344,7 @@ typedef struct {
 typedef struct {
   char Ident[32];     // Identifier of the tag
   int Idx;            // Index for multiple tags or -1
-  unsigned int Typ;  // Type of tag ty..... see const section
+  uint32_t Typ;  // Type of tag ty..... see const section
     long long TagValue; // Value of tag.
 } TagHead_t;
 

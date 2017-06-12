@@ -49,11 +49,11 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu_header){
   char Version[8];
   char Buffer[40];
   char* AnsiBuffer;
-  WCHAR* WideBuffer;
+  //WCHAR* WideBuffer;
   int Result;
 
-  long long NumRecords = -1;
-  long long RecordType = 0;
+  //long long NumRecords = -1;
+  //long long RecordType = 0;
 
   TagHead_t TagHead;
   fseek(in_stream, sizeof(Magic)+sizeof(Version), SEEK_SET);//make sure we start at the right place
@@ -278,25 +278,25 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu_header){
         if (Result!= TagHead.TagValue){
           printf("\nIncomplete File at AnsiBuffer.");
         } else if (strcmp(TagHead.Ident, name_File_GUID)==0){
-          ptu_header->File_GUID = TagHead.TagValue ;  
+		  sprintf(ptu_header->File_GUID, "%lld", TagHead.TagValue);
         } else if (strcmp(TagHead.Ident, name_File_AssuredContent)==0){
-          ptu_header->File_AssuredContent = TagHead.TagValue;
+          sprintf(ptu_header->File_AssuredContent,"%lld",TagHead.TagValue);
         } else if (strcmp(TagHead.Ident, name_CreatorSW_ContentVersion)==0){
-          ptu_header->CreatorSW_ContentVersion = TagHead.TagValue;
+          sprintf(ptu_header->CreatorSW_ContentVersion ,"%lld",TagHead.TagValue);
         } else if (strcmp(TagHead.Ident, name_CreatorSW_Name)==0){
-          ptu_header->CreatorName = TagHead.TagValue;//creatorname,version is consistent with other files
+          sprintf(ptu_header->CreatorName ,"%lld",TagHead.TagValue);//creatorname,version is consistent with other files
         } else if (strcmp(TagHead.Ident, name_CreatorSW_Version)==0){
-          ptu_header->CreatorVersion = TagHead.TagValue;
+          sprintf(ptu_header->CreatorVersion ,"%lld", TagHead.TagValue);
         } else if (strcmp(TagHead.Ident, name_File_Comment)==0){//T2 Mode!!!!!!!!!
-          ptu_header->Comment = TagHead.TagValue;
+          sprintf(ptu_header->Comment ,"%lld", TagHead.TagValue);
         } else if (strcmp(TagHead.Ident, name_HW_Type)==0){//HydraHarp400!!!!!!!!
-          ptu_header->HW_Type = TagHead.TagValue;
+          sprintf(ptu_header->HW_Type ,"%lld", TagHead.TagValue);
         } else if (strcmp(TagHead.Ident, name_HW_PartNo)==0){
-          ptu_header->HW_PartNo = TagHead.TagValue;
+          sprintf(ptu_header->HW_PartNo ,"%lld", TagHead.TagValue);
         } else if (strcmp(TagHead.Ident, name_HW_Version)==0){//Version 2.0!!!!!!!
-          ptu_header->HW_Version = TagHead.TagValue;
+          sprintf(ptu_header->HW_Version ,"%lld", TagHead.TagValue);
         } else if (strcmp(TagHead.Ident, name_HW_SerialNo)==0){
-          ptu_header->HW_SerialNo = TagHead.TagValue;
+          sprintf(ptu_header->HW_SerialNo ,"%lld", TagHead.TagValue);
         }
         //fprintf(fpout, "%s", AnsiBuffer);
         //fprintf(fpout, "  tyAnsiString");
@@ -324,7 +324,7 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu_header){
         break;
     }
   }
-  while((strncmp(TagHead.Ident, Header_End, sizeof(Header_End))));
+  while((strncmp(TagHead.Ident, name_Header_End, sizeof(name_Header_End))));
   return (PQ_SUCCESS);
 // End Header loading
 }

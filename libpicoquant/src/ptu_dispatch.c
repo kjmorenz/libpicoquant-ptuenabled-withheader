@@ -67,8 +67,8 @@ long long truensync, truetime;
 int m, c;
 double GlobRes = 0.0;
 double Resolution = 0.0;
-unsigned int dlen = 0;
-unsigned int cnt_0=0, cnt_1=0;
+uint32_t dlen = 0;
+uint32_t cnt_0=0, cnt_1=0;
 
 /*void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) {
 	tttr->sync_channel = ptu_header->InputChannelsPresent;
