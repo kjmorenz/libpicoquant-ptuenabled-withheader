@@ -29,8 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef PTU_DISPATCH_H_
+#define PTU_DISPATCH_H_
+
 #include <stdio.h>
 #include "picoquant.h"
+#include "tttr.h"
 
 #include  <windows.h>
 #include  <ncurses.h>
@@ -332,14 +336,15 @@ typedef struct {
 	int32_t *InputRate;*/
 } ptu_header_t;
 
-int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header,
-		options_t *options);
+
+
+int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header, options_t *options);
 
 time_t TDateTime_TimeT(double Convertee);
 
 void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) ;
 
-ptu_header_t ptu_header_parse(FILE *in_stream, File *out_stream);
+ptu_header_t ptu_header_parse(FILE *in_stream, FILE *out_stream);
 int get_recordtype(int32_t RecordType);
 
 #endif

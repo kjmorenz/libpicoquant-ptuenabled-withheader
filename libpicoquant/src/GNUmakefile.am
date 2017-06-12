@@ -4,6 +4,8 @@ AM_CFLAGS += -D _FILE_OFFSET_BITS=64
 
 AM_LDFLAGS =
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 bin_PROGRAMS = picoquant
 
 include_HEADERS = picoquant.h \

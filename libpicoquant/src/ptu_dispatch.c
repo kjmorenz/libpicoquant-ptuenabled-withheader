@@ -49,7 +49,6 @@
 
 #include "error.h"
 
-#include "header.h"
 
 //from ptu demo:
 #include  <windows.h>
@@ -128,7 +127,7 @@ int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header,
 	return(result);
 }
 
-ptu_header_t ptu_header_parse(FILE *in_stream, File *out_stream){
+ptu_header_t ptu_header_parse(FILE *in_stream, FILE *out_stream){
   ptu_header_t ptu_header;
   char Magic[8];
   char Version[8];

@@ -29,7 +29,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "header.h"
 
 #include "error.h"
 
@@ -56,7 +55,6 @@ void pq_header_fwrite(FILE *stream_out, pq_header_t *pq_header) {
 	fwrite(pq_header, sizeof(pq_header_t), 1, stream_out);
 }
 
-void ptu_header_fwrite(FILE *stream_out, ptu_header_t *ptu_header, pq_header_t *pq_header){
+void ptu_header_fwrite(FILE *stream_out, ptu_header_t *ptu_header){
 	fwrite(ptu_header, sizeof(ptu_header_t), 1, stream_out);
-	fwrite(pq_header, sizeof(pq_header_t), 1, stream_out);
 }

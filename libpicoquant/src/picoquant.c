@@ -61,7 +61,7 @@ int pq_dispatch(FILE *stream_in, FILE *stream_out, options_t *options) {
 	} else {
 		dispatch = pq_dispatch_get(options, &pq_header);
 		if ( dispatch == NULL ) {
-			error("Could not identify board %s.\n", pq_header.Ident, pq_header.Version, ftell);//changed
+			error("Could not identify board %s.\n", pq_header.Ident, pq_header.FormatVersion, ftell);//changed
 			//trying to find out if after original bit we're in the right place to start using the ptu
 			//header read 
 		} else {
