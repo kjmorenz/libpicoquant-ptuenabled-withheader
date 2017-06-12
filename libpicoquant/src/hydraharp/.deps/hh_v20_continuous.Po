@@ -1,1 +1,1 @@
-# dummy
+hydraharp/hh_v20_continuous.o: hydraharp/hh_v20_continuous.c

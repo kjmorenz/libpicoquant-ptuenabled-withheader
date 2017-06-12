@@ -253,41 +253,29 @@ int hh_v20_t3_stream(FILE *stream_in, FILE *stream_out,
 	}
 }
 
-ptu_hh_v20_t2_stream(FILE *stream_in, FILE *stream_out,
+int ptu_hh_v20_t2_stream(FILE *stream_in, FILE *stream_out,
 		ptu_header_t *ptu_header, options_t *options){
 	tttr_t tttr;
 	
 	ptu_hh_v20_t2_init(ptu_header, &tttr);//write
 
-	if ( options->print_resolution ){
+	if ( options->print_resolution ) {
 		pq_resolution_print(stream_out, -1,
 				tttr.resolution_float*1e12, options);
 		return(PQ_SUCCESS);
-	} else if ( options->print_mode ) {
-			if ( ptu_header->Measurement_Mode == HH_MODE_INTERACTIVE ) {
-				fprintf(stream_out, "interactive\n");
-			} else if ( ptu_header->Measurement_Mode == HH_MODE_T2 ) {
-				fprintf(stream_out, "t2\n");
-			} else if ( ptu_header->Measurement_Mode == HH_MODE_T3 ) {
-				fprintf(stream_out, "t3\n");
-			} else {
-				error("Measurement mode not recognized: %"PRId32".\n",
-						ptu_header->Measurement_Mode);
-				result = PQ_ERROR_MODE;
-			}
 	} else {
 		return(pq_t2_stream(stream_in, stream_out,
 				hh_v20_t2_decode, &tttr, options));//is this the right decode?
 	}
 }
 
-ptu_hh_v20_t3_stream(FILE *stream_in, FILE *stream_out,
+int ptu_hh_v20_t3_stream(FILE *stream_in, FILE *stream_out,
 		ptu_header_t *ptu_header, options_t *options){
 	tttr_t tttr;
 	
 	ptu_hh_v20_t3_init(ptu_header, &tttr);//write
 	
-	if ( options->print_resolution ){
+	if ( options->print_resolution ) {
 		pq_resolution_print(stream_out, -1,
 				tttr.resolution_float*1e12, options);
 		return(PQ_SUCCESS);

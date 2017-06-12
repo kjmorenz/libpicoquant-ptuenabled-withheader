@@ -1,1 +1,1 @@
-# dummy
+timeharp/th_v50_continuous.o: timeharp/th_v50_continuous.c

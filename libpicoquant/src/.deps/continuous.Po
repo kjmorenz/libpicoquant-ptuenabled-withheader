@@ -1,1 +1,1 @@
-# dummy
+continuous.o: continuous.c
