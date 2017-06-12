@@ -44,8 +44,7 @@ int pq_header_read(FILE *stream_in, pq_header_t *pq_header) {
 	}
 }
 
-int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu header){
-  ptu_header_t ptu_header;
+int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu_header){
   char Magic[8];
   char Version[8];
   char Buffer[40];
@@ -60,10 +59,10 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu header){
   fseek(in_stream, sizeof(Magic)+sizeof(Version), SEEK_SET);//make sure we start at the right place
   // read tagged header
   do{
-    Result = fread( &TagHead, 1, sizeof(TagHead) ,fpin);
+    Result = fread( &TagHead, 1, sizeof(TagHead) ,in_stream);
     if (Result!= sizeof(TagHead))
     {
-        error("Incomplete file in header of ptu")
+        error("Incomplete file in header of ptu");
     }
 
     strcpy(Buffer, TagHead.Ident);
@@ -71,165 +70,165 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu header){
     {
       sprintf(Buffer, "%s(%d)", TagHead.Ident,TagHead.Idx);
     }
-    fprintf(fpout, "\n%-40s", Buffer);
+    //fprintf(fpout, "\n%-40s", Buffer);
     switch (TagHead.Typ)
     {
       case tyEmpty8:
-        if (strcmp(TagHead.Ident, FastLoadEnd)==0){
-          ptu_header.Fast_Load_End = TagHead.TagValue ;//just kept everything  
+        if (strcmp(TagHead.Ident, name_Fast_Load_End)==0){
+          ptu_header->Fast_Load_End = TagHead.TagValue ;//just kept everything  
         }
         //fprintf(fpout, "<empty Tag>");
         break;
       case tyBool8:
         if (strcmp(TagHead.Ident, name_MeasDesc_StopOnOvfl)==0){
-          ptu_header.MeasDesc_StopOnOvfl = TagHead.TagValue ;  
+          ptu_header->MeasDesc_StopOnOvfl = TagHead.TagValue ;  
         } else if (strcmp(TagHead.Ident, name_MeasDesc_Restart)==0){
-          ptu_header.MeasDesc_Restart = TagHead.TagValue;   
+          ptu_header->MeasDesc_Restart = TagHead.TagValue;   
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispLog)==0){
-          ptu_header.CurSWSetting_DispLog = TagHead.TagValue ;  
+          ptu_header->CurSWSetting_DispLog = TagHead.TagValue ;  
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_Show0)==0){
-          ptu_header.CurSWSetting_DispCurve_Show0 = TagHead.TagValue;   
+          ptu_header->CurSWSetting_DispCurve_Show0 = TagHead.TagValue;   
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_Show1)==0){
-          ptu_header.CurSWSetting_DispCurve_Show1 = TagHead.TagValue;   
+          ptu_header->CurSWSetting_DispCurve_Show1 = TagHead.TagValue;   
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_Show2)==0){
-          ptu_header.CurSWSetting_DispCurve_Show2 = TagHead.TagValue;   
+          ptu_header->CurSWSetting_DispCurve_Show2 = TagHead.TagValue;   
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_Show3)==0){
-          ptu_header.CurSWSetting_DispCurve_Show3 = TagHead.TagValue;   
+          ptu_header->CurSWSetting_DispCurve_Show3 = TagHead.TagValue;   
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_Show4)==0){
-          ptu_header.CurSWSetting_DispCurve_Show4 = TagHead.TagValue  ; 
+          ptu_header->CurSWSetting_DispCurve_Show4 = TagHead.TagValue  ; 
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_Show5)==0){
-          ptu_header.CurSWSetting_DispCurve_Show5 = TagHead.TagValue   
+          ptu_header->CurSWSetting_DispCurve_Show5 = TagHead.TagValue;   
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_Show6)==0){
-          ptu_header.CurSWSetting_DispCurve_Show6 = TagHead.TagValue;   
+          ptu_header->CurSWSetting_DispCurve_Show6 = TagHead.TagValue;   
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_Show7)==0){
-          ptu_header.CurSWSetting_DispCurve_Show7 = TagHead.TagValue ;  
+          ptu_header->CurSWSetting_DispCurve_Show7 = TagHead.TagValue ;  
         } else if (strcmp(TagHead.Ident, name_HW_ExternalRefClock)==0){
-          ptu_header.HW_ExternalRefClock = TagHead.TagValue ;  
-        } else if (strcmp(TagHead.Ident, name_HWInpChan_Enabled0==0){
-          ptu_header.HWInpChan_Enabled0 = TagHead.TagValue;   
-        } else if (strcmp(TagHead.Ident, name_HWInpChan_Enabled1==0){
-          ptu_header.HWInpChan_Enabled1 = TagHead.TagValue ;  
-        } else if (strcmp(TagHead.Ident, name_HWMarkers_RisingEdge0==0){
-          ptu_header.HWMarkers_RisingEdge0 = TagHead.TagValue  ; 
-        } else if (strcmp(TagHead.Ident, name_HWMarkers_RisingEdge1==0){
-          ptu_header.HWMarkers_RisingEdge1 = TagHead.TagValue ;  
-        } else if (strcmp(TagHead.Ident, name_HWMarkers_RisingEdge2==0){
-          ptu_header.HWMarkers_RisingEdge2 = TagHead.TagValue ;  
-        } else if (strcmp(TagHead.Ident, name_HWMarkers_RisingEdge3==0){
-          ptu_header.HWMarkers_RisingEdge3 = TagHead.TagValue;   
-        } else if (strcmp(TagHead.Ident, name_HWMarkers_Enabled0==0){
-          ptu_header.HWMarkers_Enabled0 = TagHead.TagValue  ; 
-        } else if (strcmp(TagHead.Ident, name_HWMarkers_Enabled1==0){
-          ptu_header.HWMarkers_Enabled1 = TagHead.TagValue ;  
-        } else if (strcmp(TagHead.Ident, name_HWMarkers_Enabled2==0){
-          ptu_header.HWMarkers_Enabled2 = TagHead.TagValue ;  
-        } else if (strcmp(TagHead.Ident, name_HWMarkers_Enabled3==0){
-          ptu_header.HWMarkers_Enabled3 = TagHead.TagValue;   
+          ptu_header->HW_ExternalRefClock = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, name_HWInpChan_Enabled0)==0){
+          ptu_header->HWInpChan_Enabled0 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, name_HWInpChan_Enabled1)==0){
+          ptu_header->HWInpChan_Enabled1 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, name_HWMarkers_RisingEdge0)==0){
+          ptu_header->HWMarkers_RisingEdge0 = TagHead.TagValue  ; 
+        } else if (strcmp(TagHead.Ident, name_HWMarkers_RisingEdge1)==0){
+          ptu_header->HWMarkers_RisingEdge1 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, name_HWMarkers_RisingEdge2)==0){
+          ptu_header->HWMarkers_RisingEdge2 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, name_HWMarkers_RisingEdge3)==0){
+          ptu_header->HWMarkers_RisingEdge3 = TagHead.TagValue;   
+        } else if (strcmp(TagHead.Ident, name_HWMarkers_Enabled0)==0){
+          ptu_header->HWMarkers_Enabled0 = TagHead.TagValue  ; 
+        } else if (strcmp(TagHead.Ident, name_HWMarkers_Enabled1)==0){
+          ptu_header->HWMarkers_Enabled1 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, name_HWMarkers_Enabled2)==0){
+          ptu_header->HWMarkers_Enabled2 = TagHead.TagValue ;  
+        } else if (strcmp(TagHead.Ident, name_HWMarkers_Enabled3)==0){
+          ptu_header->HWMarkers_Enabled3 = TagHead.TagValue;   
         }
         //fprintf(fpout, "%s", bool(TagHead.TagValue)?"True":"False");
         //fprintf(fpout, "  tyBool8");
         break;
       case tyInt8:
         if (strcmp(TagHead.Ident, name_Measurement_Mode)==0){
-          ptu_header.Measurement_Mode = TagHead.TagValue ;  
+          ptu_header->Measurement_Mode = TagHead.TagValue ;  
         } else if (strcmp(TagHead.Ident, name_Measurement_SubMode)==0){
-          ptu_header.Measurement_SubMode = TagHead.TagValue;
+          ptu_header->Measurement_SubMode = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_TTResult_StopReason)==0){
-          ptu_header.TTResult_StopReason = TagHead.TagValue;
+          ptu_header->TTResult_StopReason = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_TTResultFormat_TTTRRecType)==0){
-          ptu_header.TTResultFormat_TTTRRecType = TagHead.TagValue;
+          ptu_header->TTResultFormat_TTTRRecType = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_TTResultFormat_BitsPerRecord)==0){
-          ptu_header.TTResultFormat_BitsPerRecord = TagHead.TagValue;
+          ptu_header->TTResultFormat_BitsPerRecord = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_MeasDesc_BinningFactor)==0){
-          ptu_header.MeasDesc_BinningFactor = TagHead.TagValue;
+          ptu_header->MeasDesc_BinningFactor = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_MeasDesc_Offset)==0){
-          ptu_header.MeasDesc_Offset = TagHead.TagValue;
+          ptu_header->MeasDesc_Offset = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_MeasDesc_AcquisitionTime)==0){
-          ptu_header.MeasDesc_AcquisitionTime = TagHead.TagValue;
+          ptu_header->MeasDesc_AcquisitionTime = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_MeasDesc_StopAt)==0){
-          ptu_header.MeasDesc_StopAt = TagHead.TagValue;
+          ptu_header->MeasDesc_StopAt = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispAxisTimeFrom)==0){
-          ptu_header.CurSWSetting_DispAxisTimeFrom = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispAxisTimeFrom = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispAxisTimeTo)==0){
-          ptu_header.CurSWSetting_DispAxisTimeTo = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispAxisTimeTo = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispAxisCountFrom)==0){
-          ptu_header.CurSWSetting_DispAxisCountFrom = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispAxisCountFrom = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispAxisCountTo)==0){
-          ptu_header.CurSWSetting_DispAxisCountTo = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispAxisCountTo = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurves)==0){
-          ptu_header.CurSWSetting_DispCurves = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurves = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_MapTo0)==0){
-          ptu_header.CurSWSetting_DispCurve_MapTo0 = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurve_MapTo0 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_MapTo1)==0){
-          ptu_header.CurSWSetting_DispCurve_MapTo1 = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurve_MapTo1 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_MapTo2)==0){
-          ptu_header.CurSWSetting_DispCurve_MapTo2 = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurve_MapTo2 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_MapTo3)==0){
-          ptu_header.CurSWSetting_DispCurve_MapTo3 = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurve_MapTo3 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_MapTo4)==0){
-          ptu_header.CurSWSetting_DispCurve_MapTo4 = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurve_MapTo4 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_MapTo5)==0){
-          ptu_header.CurSWSetting_DispCurve_MapTo5 = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurve_MapTo5 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_MapTo6)==0){
-          ptu_header.CurSWSetting_DispCurve_MapTo6 = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurve_MapTo6 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CurSWSetting_DispCurve_MapTo7)==0){
-          ptu_header.CurSWSetting_DispCurve_MapTo7 = TagHead.TagValue;
+          ptu_header->CurSWSetting_DispCurve_MapTo7 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HW_Modules )==0){
-          ptu_header.HW_Modules  = TagHead.TagValue;
+          ptu_header->HW_Modules  = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWModule_TypeCode0)==0){
-          ptu_header.HWModule_TypeCode0 = TagHead.TagValue;
+          ptu_header->HWModule_TypeCode0 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWModule_TypeCode1)==0){
-          ptu_header.HWModule_TypeCode1 = TagHead.TagValue;
+          ptu_header->HWModule_TypeCode1 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWModule_TypeCode2)==0){
-          ptu_header.HWModule_TypeCode2 = TagHead.TagValue;
+          ptu_header->HWModule_TypeCode2 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWModule_VersCode0)==0){
-          ptu_header.HWModule_VersCode0 = TagHead.TagValue;
+          ptu_header->HWModule_VersCode0 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWModule_VersCode1)==0){
-          ptu_header.HWModule_VersCode1 = TagHead.TagValue;
+          ptu_header->HWModule_VersCode1 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWModule_VersCode2)==0){
-          ptu_header.HWModule_VersCode2 = TagHead.TagValue;
+          ptu_header->HWModule_VersCode2 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HW_InpChannels)==0){
-          ptu_header.HW_InpChannels = TagHead.TagValue;
+          ptu_header->HW_InpChannels = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HW_ExternalDevices)==0){
-          ptu_header.HW_ExternalDevices = TagHead.TagValue;
+          ptu_header->HW_ExternalDevices = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWSync_Divider)==0){
-          ptu_header.HWSync_Divider = TagHead.TagValue;
+          ptu_header->HWSync_Divider = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWSync_CFDLevel)==0){
-          ptu_header.HWSync_CFDLevel = TagHead.TagValue;
+          ptu_header->HWSync_CFDLevel = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWSync_CFDZeroCross)==0){
-          ptu_header.HWSync_CFDZeroCross = TagHead.TagValue;
+          ptu_header->HWSync_CFDZeroCross = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWSync_Offset)==0){
-          ptu_header.HWSync_Offset = TagHead.TagValue;
+          ptu_header->HWSync_Offset = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWInpChan_ModuleIdx0)==0){
-          ptu_header.HWInpChan_ModuleIdx0 = TagHead.TagValue;
+          ptu_header->HWInpChan_ModuleIdx0 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWInpChan_ModuleIdx1)==0){
-          ptu_header.HWInpChan_ModuleIdx1 = TagHead.TagValue;
+          ptu_header->HWInpChan_ModuleIdx1 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWInpChan_CFDLevel0)==0){
-          ptu_header.HWInpChan_CFDLevel0 = TagHead.TagValue;
+          ptu_header->HWInpChan_CFDLevel0 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWInpChan_CFDLevel1)==0){
-          ptu_header.HWInpChan_CFDLevel1 = TagHead.TagValue;
+          ptu_header->HWInpChan_CFDLevel1 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWInpChan_CFDZeroCross0)==0){
-          ptu_header.HWInpChan_CFDZeroCross0 = TagHead.TagValue;
+          ptu_header->HWInpChan_CFDZeroCross0 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWInpChan_CFDZeroCross1)==0){
-          ptu_header.HWInpChan_CFDZeroCross1 = TagHead.TagValue;
+          ptu_header->HWInpChan_CFDZeroCross1 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWInpChan_Offset0)==0){
-          ptu_header.HWInpChan_Offset0 = TagHead.TagValue;
+          ptu_header->HWInpChan_Offset0 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWInpChan_Offset1)==0){
-          ptu_header.HWInpChan_Offset1 = TagHead.TagValue;
+          ptu_header->HWInpChan_Offset1 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HW_Markers)==0){
-          ptu_header.HW_Markers = TagHead.TagValue;
+          ptu_header->HW_Markers = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HWMarkers_HoldOff )==0){
-          ptu_header.HWMarkers_HoldOff = TagHead.TagValue;
+          ptu_header->HWMarkers_HoldOff = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_TTResult_SyncRate)==0){
-          ptu_header.TTResult_SyncRate = TagHead.TagValue;
+          ptu_header->TTResult_SyncRate = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_TTResult_InputRate0)==0){
-          ptu_header.TTResult_InputRate0 = TagHead.TagValue;
+          ptu_header->TTResult_InputRate0 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_TTResult_InputRate1)==0){
-          ptu_header.TTResult_InputRate1 = TagHead.TagValue;
+          ptu_header->TTResult_InputRate1 = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_TTResult_StopAfter)==0){
-          ptu_header.TTResult_StopAfter = TagHead.TagValue;
+          ptu_header->TTResult_StopAfter = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_TTResult_NumberOfRecords)==0){
-          ptu_header.TTResult_NumberOfRecords = TagHead.TagValue;
+          ptu_header->TTResult_NumberOfRecords = TagHead.TagValue;
         }
         /*fprintf(fpout, "%lld", TagHead.TagValue);
         fprintf(fpout, "  tyInt8");
@@ -249,11 +248,11 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu header){
         break;*/
       case tyFloat8:
         if (strcmp(TagHead.Ident, name_HW_BaseResolution)==0){ //this one probs not needed
-          ptu_header.HW_BaseResolution = *(double*)&(TagHead.TagValue);   
+          ptu_header->HW_BaseResolution = TagHead.TagValue;   
         } else if (strcmp(TagHead.Ident, name_MeasDesc_Resolution)==0){
-          ptu_header.MeasDesc_Resolution = *(double*)&(TagHead.TagValue);
+          ptu_header->MeasDesc_Resolution = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_MeasDesc_GlobalResolution)==0){
-          ptu_header.MeasDesc_GlobalResolution = *(double*)&(TagHead.TagValue);//in ns
+          ptu_header->MeasDesc_GlobalResolution = TagHead.TagValue;//in ns
         }/*
         fprintf(fpout, "%E", *(double*)&(TagHead.TagValue));
         fprintf(fpout, "  tyFloat8");
@@ -266,39 +265,38 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu header){
         fprintf(fpout, "<Float Array with %d Entries>", TagHead.TagValue / sizeof(double));
         fprintf(fpout, "  tyFloat8Array");
         // only seek the Data, if one needs the data, it can be loaded here
-        fseek(fpin, (long)TagHead.TagValue, SEEK_CUR);
+        fseek(in_stream, (long)TagHead.TagValue, SEEK_CUR);
         break;*/
       case tyTDateTime:
-        time_t CreateTime;
-        ptu_header.FileTime = TDateTime_TimeT(*((double*)&(TagHead.TagValue)));
+        ptu_header->FileTime = TDateTime_TimeT(*((double*)&(TagHead.TagValue)));
         //fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
         //fprintf(fpout, "  tyTDateTime");
         break;
       case tyAnsiString:
         AnsiBuffer = (char*)calloc((size_t)TagHead.TagValue,1);
-        Result = fread(AnsiBuffer, 1, (size_t)TagHead.TagValue, fpin);
+        Result = fread(AnsiBuffer, 1, (size_t)TagHead.TagValue, in_stream);
         if (Result!= TagHead.TagValue){
           printf("\nIncomplete File at AnsiBuffer.");
         } else if (strcmp(TagHead.Ident, name_File_GUID)==0){
-          ptu_header.File_GUID = TagHead.TagValue ;  
+          ptu_header->File_GUID = TagHead.TagValue ;  
         } else if (strcmp(TagHead.Ident, name_File_AssuredContent)==0){
-          ptu_header.File_AssuredContent = TagHead.TagValue;
+          ptu_header->File_AssuredContent = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CreatorSW_ContentVersion)==0){
-          ptu_header.CreatorSW_ContentVersion = TagHead.TagValue;
+          ptu_header->CreatorSW_ContentVersion = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_CreatorSW_Name)==0){
-          ptu_header.CreatorName = TagHead.TagValue;//creatorname,version is consistent with other files
+          ptu_header->CreatorName = TagHead.TagValue;//creatorname,version is consistent with other files
         } else if (strcmp(TagHead.Ident, name_CreatorSW_Version)==0){
-          ptu_header.CreatorVersion = TagHead.TagValue;
+          ptu_header->CreatorVersion = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_File_Comment)==0){//T2 Mode!!!!!!!!!
-          ptu_header.Comment = TagHead.TagValue;
+          ptu_header->Comment = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HW_Type)==0){//HydraHarp400!!!!!!!!
-          ptu_header.HW_Type = TagHead.TagValue;
+          ptu_header->HW_Type = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HW_PartNo)==0){
-          ptu_header.HW_PartNo = TagHead.TagValue;
+          ptu_header->HW_PartNo = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HW_Version)==0){//Version 2.0!!!!!!!
-          ptu_header.HW_Version = TagHead.TagValue;
+          ptu_header->HW_Version = TagHead.TagValue;
         } else if (strcmp(TagHead.Ident, name_HW_SerialNo)==0){
-          ptu_header.HW_SerialNo = TagHead.TagValue;
+          ptu_header->HW_SerialNo = TagHead.TagValue;
         }
         //fprintf(fpout, "%s", AnsiBuffer);
         //fprintf(fpout, "  tyAnsiString");
@@ -306,7 +304,7 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu header){
         break;
       /*case tyWideString:
         WideBuffer = (WCHAR*)calloc((size_t)TagHead.TagValue,1);
-        Result = fread(WideBuffer, 1, (size_t)TagHead.TagValue, fpin);
+        Result = fread(WideBuffer, 1, (size_t)TagHead.TagValue, in_stream);
         if (Result!= TagHead.TagValue){
           printf("\nIncomplete File at WideBuffer");
         }
@@ -318,7 +316,7 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu header){
         fprintf(fpout, "<Binary Blob contains %d Bytes>", TagHead.TagValue);
         fprintf(fpout, "  tyBinaryBlob");
         // only seek the Data, if one needs the data, it can be loaded here
-        fseek(fpin, (long)TagHead.TagValue, SEEK_CUR);
+        fseek(in_stream, (long)TagHead.TagValue, SEEK_CUR);
         break;*/
       default:
         	//error  ("Illegal Type identifier found! Broken file?");

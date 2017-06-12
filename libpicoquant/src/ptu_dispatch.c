@@ -59,7 +59,7 @@
 #include  <stdlib.h>
 #include  <time.h>
 
-FILE *fpin,*fpout;
+
 bool IsT2;
 long long RecNum;
 long long oflcorrection;
