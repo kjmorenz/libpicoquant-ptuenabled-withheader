@@ -26,7 +26,6 @@ picoharp/ph_v20.o: picoharp/ph_v20.c /usr/include/stdlib.h \
  /usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/stdint.h \
  /usr/include/stdint.h /usr/include/sys/_intsup.h /usr/include/inttypes.h \
  picoharp/../options.h picoharp/../header.h picoharp/../picoquant.h \
- picoharp/../ptu_dispatch.h picoharp/../tttr.h \
  /usr/include/w32api/windows.h /usr/include/w32api/_mingw.h \
  /usr/include/w32api/_mingw_mac.h /usr/include/w32api/_mingw_secapi.h \
  /usr/include/w32api/_cygwin.h /usr/include/w32api/vadefs.h \
@@ -151,9 +150,10 @@ picoharp/ph_v20.o: picoharp/ph_v20.c /usr/include/stdlib.h \
  /usr/include/w32api/mcx.h /usr/include/w32api/imm.h \
  /usr/include/curses.h /usr/include/ncurses_dll.h \
  /usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/stdbool.h \
- /usr/include/unctrl.h /usr/include/curses.h picoharp/../interactive.h \
- picoharp/../t2.h picoharp/../t3.h picoharp/../tttr.h \
- picoharp/../picoharp.h picoharp/../error.h
+ /usr/include/unctrl.h /usr/include/curses.h picoharp/../ptu_dispatch.h \
+ picoharp/../tttr.h picoharp/../interactive.h picoharp/../t2.h \
+ picoharp/../t3.h picoharp/../tttr.h picoharp/../picoharp.h \
+ picoharp/../error.h
 
 /usr/include/stdlib.h:
 
@@ -268,10 +268,6 @@ picoharp/../options.h:
 picoharp/../header.h:
 
 picoharp/../picoquant.h:
-
-picoharp/../ptu_dispatch.h:
-
-picoharp/../tttr.h:
 
 /usr/include/w32api/windows.h:
 
@@ -654,6 +650,10 @@ picoharp/../tttr.h:
 /usr/include/unctrl.h:
 
 /usr/include/curses.h:
+
+picoharp/../ptu_dispatch.h:
+
+picoharp/../tttr.h:
 
 picoharp/../interactive.h:
 

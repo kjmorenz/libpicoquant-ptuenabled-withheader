@@ -71,7 +71,7 @@ uint32_t dlen = 0;
 uint32_t cnt_0=0, cnt_1=0;
 
 /*void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) {
-	tttr->sync_channel = ptu_header->InputChannelsPresent;
+	tttr->sync_channel = ptu_header.InputChannelsPresent;
 	tttr->origin = 0;
 	tttr->overflows = 0;
   if isT2{
@@ -79,7 +79,7 @@ uint32_t cnt_0=0, cnt_1=0;
     tttr->resolution_float = HH_BASE_RESOLUTION;
   } else {
     tttr->overflow_increment = HH_T3_OVERFLOW;
-    tttr->resolution_float = ptu_header->Resolution*1e-12;
+    tttr->resolution_float = ptu_header.Resolution*1e-12;
   }//NOW THIS ONLY WORKS FOR HH
 	tttr->sync_rate = tttr_header->SyncRate;
 	
@@ -105,12 +105,13 @@ int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header,
     //reparse header as a ptu file
     ptu_header_t ptu_header;
 
-    result = ptu_header_read(stream_in, &ptu_header)
+    result = ptu_header_parse(in_stream, &ptu_header);
+
     if ( result ) {
 		  error("Could not read string header.\n");
     }
     //find hardware
-    isT2 = get_recordtype(ptu_header->TTResultFormat_TTTRRecType);//need to define header, record type
+    isT2 = get_recordtype(ptu_header.TTResultFormat_TTTRRecType);//need to define header, record type
     
     pq_header->FormatVersion = ptu_header.FormatVersion;
     
@@ -124,15 +125,15 @@ int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header,
 				pq_header_printf(stream_out, pq_header);
 			}
 	  } else if ( options->print_mode ) {
-			if ( ptu_header->Measurement_Mode == HH_MODE_INTERACTIVE ) {
+			if ( ptu_header.Measurement_Mode == HH_MODE_INTERACTIVE ) {
 				fprintf(stream_out, "interactive\n");
-			} else if ( ptu_header->Measurement_Mode == HH_MODE_T2 ) {
+			} else if ( ptu_header.Measurement_Mode == HH_MODE_T2 ) {
 				fprintf(stream_out, "t2\n");
-			} else if ( ptu_header->Measurement_Mode == HH_MODE_T3 ) {
+			} else if ( ptu_header.Measurement_Mode == HH_MODE_T3 ) {
 				fprintf(stream_out, "t3\n");
 			} else {
 				error("Measurement mode not recognized: %"PRId32".\n",
-						ptu_header->Measurement_Mode);
+						ptu_header.Measurement_Mode);
 				return(PQ_ERROR_MODE);
 			}
 	  } else if ( isT2) { 

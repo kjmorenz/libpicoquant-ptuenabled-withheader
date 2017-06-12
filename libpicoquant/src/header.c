@@ -268,7 +268,10 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu_header){
         fseek(in_stream, (long)TagHead.TagValue, SEEK_CUR);
         break;*/
       case tyTDateTime:
-        ptu_header->FileTime = TDateTime_TimeT(*((double*)&(TagHead.TagValue)));
+	  	;//need empty statement before declaration after a :
+	  	time_t ftime;
+		ftime = TDateTime_TimeT(*((double*)&(TagHead.TagValue)));
+        strftime(ptu_header->FileTime, 20, "%Y-%m-%d %H:%M:%S", localtime(&ftime));
         //fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
         //fprintf(fpout, "  tyTDateTime");
         break;

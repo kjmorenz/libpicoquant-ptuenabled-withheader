@@ -27,7 +27,6 @@ hydraharp/hh_v20_interactive.o: hydraharp/hh_v20_interactive.c \
  /usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/stdint.h \
  /usr/include/stdint.h /usr/include/sys/_intsup.h /usr/include/inttypes.h \
  hydraharp/../options.h hydraharp/../header.h hydraharp/../picoquant.h \
- hydraharp/../ptu_dispatch.h hydraharp/../tttr.h \
  /usr/include/w32api/windows.h /usr/include/w32api/_mingw.h \
  /usr/include/w32api/_mingw_mac.h /usr/include/w32api/_mingw_secapi.h \
  /usr/include/w32api/_cygwin.h /usr/include/w32api/vadefs.h \
@@ -152,9 +151,10 @@ hydraharp/hh_v20_interactive.o: hydraharp/hh_v20_interactive.c \
  /usr/include/w32api/mcx.h /usr/include/w32api/imm.h \
  /usr/include/curses.h /usr/include/ncurses_dll.h \
  /usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/stdbool.h \
- /usr/include/unctrl.h /usr/include/curses.h hydraharp/../interactive.h \
- hydraharp/../t2.h hydraharp/../t3.h hydraharp/../hydraharp.h \
- hydraharp/../header.h hydraharp/../error.h
+ /usr/include/unctrl.h /usr/include/curses.h hydraharp/../ptu_dispatch.h \
+ hydraharp/../tttr.h hydraharp/../interactive.h hydraharp/../t2.h \
+ hydraharp/../t3.h hydraharp/../hydraharp.h hydraharp/../header.h \
+ hydraharp/../error.h
 
 /usr/include/stdlib.h:
 
@@ -271,10 +271,6 @@ hydraharp/../options.h:
 hydraharp/../header.h:
 
 hydraharp/../picoquant.h:
-
-hydraharp/../ptu_dispatch.h:
-
-hydraharp/../tttr.h:
 
 /usr/include/w32api/windows.h:
 
@@ -657,6 +653,10 @@ hydraharp/../tttr.h:
 /usr/include/unctrl.h:
 
 /usr/include/curses.h:
+
+hydraharp/../ptu_dispatch.h:
+
+hydraharp/../tttr.h:
 
 hydraharp/../interactive.h:
 

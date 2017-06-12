@@ -23,7 +23,7 @@ hydraharp.o: hydraharp.c /usr/include/string.h /usr/include/_ansi.h \
  /usr/include/cygwin/signal.h /usr/include/sys/ucontext.h \
  /usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/stdint.h \
  /usr/include/stdint.h /usr/include/sys/_intsup.h /usr/include/inttypes.h \
- options.h header.h ptu_dispatch.h tttr.h /usr/include/w32api/windows.h \
+ options.h header.h /usr/include/w32api/windows.h \
  /usr/include/w32api/_mingw.h /usr/include/w32api/_mingw_mac.h \
  /usr/include/w32api/_mingw_secapi.h /usr/include/w32api/_cygwin.h \
  /usr/include/w32api/vadefs.h /usr/include/w32api/sdks/_mingw_directx.h \
@@ -148,8 +148,9 @@ hydraharp.o: hydraharp.c /usr/include/string.h /usr/include/_ansi.h \
  /usr/include/w32api/mcx.h /usr/include/w32api/imm.h \
  /usr/include/curses.h /usr/include/ncurses_dll.h \
  /usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/stdbool.h \
- /usr/include/unctrl.h /usr/include/curses.h interactive.h t2.h t3.h \
- hydraharp/hh_v10.h hydraharp/../picoquant.h hydraharp/hh_v20.h error.h
+ /usr/include/unctrl.h /usr/include/curses.h ptu_dispatch.h tttr.h \
+ interactive.h t2.h t3.h hydraharp/hh_v10.h hydraharp/../picoquant.h \
+ hydraharp/hh_v20.h error.h
 
 /usr/include/string.h:
 
@@ -256,10 +257,6 @@ types.h:
 options.h:
 
 header.h:
-
-ptu_dispatch.h:
-
-tttr.h:
 
 /usr/include/w32api/windows.h:
 
@@ -648,6 +645,10 @@ tttr.h:
 /usr/include/unctrl.h:
 
 /usr/include/curses.h:
+
+ptu_dispatch.h:
+
+tttr.h:
 
 interactive.h:
 

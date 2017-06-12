@@ -192,7 +192,7 @@ typedef struct {
 typedef struct {
 	char CreatorName[18];
 	char CreatorVersion[12];
-	char FileTime[18];
+	char FileTime[20];
 	//char CRLF[2];//seems to be unused for everyone, what does this even stand for?
 	char Comment[256];
 	int32_t NumberOfCurves;
