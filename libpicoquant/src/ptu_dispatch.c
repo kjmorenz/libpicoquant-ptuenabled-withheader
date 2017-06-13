@@ -90,13 +90,6 @@ uint32_t cnt_0=0, cnt_1=0;
 
 
 
-time_t TDateTime_TimeT(double Convertee){
-    const int EpochDiff = 25569; // days between 30/12/1899 and 01/01/1970
-    const int SecsInDay = 86400; // number of seconds in a day
-    time_t Result; 
-    Result = ((long)(((Convertee) - EpochDiff) * SecsInDay));
-    return Result;
-}
 
 
 int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header, 
@@ -111,35 +104,35 @@ int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header,
 		  error("Could not read string header.\n");
     }
     //find hardware
-    isT2 = get_recordtype(ptu_header.TTResultFormat_TTTRRecType);//need to define header, record type
+    uint32_t isT2 = get_recordtype(ptu_header.TTResultFormat_TTTRRecType);//need to define header, record type
     
-    pq_header->FormatVersion = ptu_header.FormatVersion;
+    sprintf(pq_header->FormatVersion, "%s", ptu_header.CreatorSW_ContentVersion);
     
     //read it!
-    if ( isT2 == NULL ) {
+    if ( isT2 == '\0' ) {
 		  error("Board is not supported in ptu format: %s.\n", pq_header->Ident, pq_header->FormatVersion, ftell);
     } else if ( options->print_header ) {
 			if ( options->binary_out ) {
-				ptu_header_fwrite(stream_out, ptu_header);
+				ptu_header_fwrite(out_stream, &ptu_header);
 			} else {
-				pq_header_printf(stream_out, pq_header);
+				pq_header_printf(out_stream, pq_header);
 			}
 	  } else if ( options->print_mode ) {
 			if ( ptu_header.Measurement_Mode == HH_MODE_INTERACTIVE ) {
-				fprintf(stream_out, "interactive\n");
+				fprintf(out_stream, "interactive\n");
 			} else if ( ptu_header.Measurement_Mode == HH_MODE_T2 ) {
-				fprintf(stream_out, "t2\n");
+				fprintf(out_stream, "t2\n");
 			} else if ( ptu_header.Measurement_Mode == HH_MODE_T3 ) {
-				fprintf(stream_out, "t3\n");
+				fprintf(out_stream, "t3\n");
 			} else {
 				error("Measurement mode not recognized: %"PRId32".\n",
 						ptu_header.Measurement_Mode);
 				return(PQ_ERROR_MODE);
 			}
 	  } else if ( isT2) { 
-		  result = ptu_hh_V20_t2_stream(*in_stream, *out_stream, *ptu_header, *options);
+		  result = ptu_hh_v20_t2_stream(in_stream, out_stream, &ptu_header, options);
 	  } else {
-      result = ptu_hh_V20_t3_stream(*in_stream, *out_stream, *ptu_header, *options);
+      result = ptu_hh_v20_t3_stream(in_stream, out_stream, &ptu_header, options);
     }                                     
 
 	return(result);
@@ -212,7 +205,7 @@ int get_recordtype(int32_t RecordType){ //only hydraharp gives correct version
       break;*/
   default:
     error("Unknown record type: 0x%X\n 0x%X\n ", RecordType);
-    return NULL;
+    return '\0';
   }
   
 }

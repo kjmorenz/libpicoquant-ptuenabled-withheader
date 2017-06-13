@@ -41,7 +41,7 @@
 
 int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header, options_t *options);
 
-void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) ;
+
 
 int get_recordtype(int32_t RecordType);
 
