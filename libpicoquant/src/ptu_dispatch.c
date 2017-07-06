@@ -32,12 +32,13 @@
 #include <string.h>
 
 #include "hydraharp.h"
-#include "hydraharp/hh_v10.h"
+
 #include "hydraharp/hh_v20.h"
 
 //for when eventually we can also handle ptu from other hardware
-#include "picoharp.h"
+#include "hydraharp/hh_v10.h"
 
+#include "picoharp.h"
 #include "picoharp/ph_v20.h"
 
 #include "timeharp.h"
@@ -48,7 +49,17 @@
 
 #include "error.h"
 
-FILE *fpin,*fpout;
+
+//from ptu demo:
+#include  <windows.h>
+#include  <ncurses.h>
+#include  <stdio.h>
+
+#include  <stddef.h>
+#include  <stdlib.h>
+#include  <time.h>
+
+
 bool IsT2;
 long long RecNum;
 long long oflcorrection;
@@ -56,168 +67,102 @@ long long truensync, truetime;
 int m, c;
 double GlobRes = 0.0;
 double Resolution = 0.0;
-unsigned int dlen = 0;
-unsigned int cnt_0=0, cnt_1=0;
+uint32_t dlen = 0;
+uint32_t cnt_0=0, cnt_1=0;
 
-void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) {
-	tttr->sync_channel = ptu_header->InputChannelsPresent;
+/*void tttr_init(ptu_header_t *ptu_header, tttr_t *tttr) {
+	tttr->sync_channel = ptu_header.InputChannelsPresent;
 	tttr->origin = 0;
 	tttr->overflows = 0;
-	tttr->overflow_increment = HH_T2_OVERFLOW;//NOW THIS ONLY WORKS FOR HH
+  if isT2{
+	  tttr->overflow_increment = HH_T2_OVERFLOW;
+    tttr->resolution_float = HH_BASE_RESOLUTION;
+  } else {
+    tttr->overflow_increment = HH_T3_OVERFLOW;
+    tttr->resolution_float = ptu_header.Resolution*1e-12;
+  }//NOW THIS ONLY WORKS FOR HH
 	tttr->sync_rate = tttr_header->SyncRate;
-	tttr->resolution_float = HH_BASE_RESOLUTION;
+	
 	tttr->resolution_int = floor(fabs(tttr->resolution_float*1e12));
-}
+}*/
+
+// TDateTime (in file) to time_t (standard C) conversion
+
+
+
+
 
 int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header, 
 		options_t *options) {
-	int result;
-//reparse header as a ptu file
-    ptu_header = ptu_header_parse(in_stream, out_stream)//check that this is how you should send these
+	  int result;
+    //reparse header as a ptu file
+    ptu_header_t ptu_header;
 
+    result = ptu_header_parse(in_stream, &ptu_header);
+
+    if ( result ) {
+		  error("Could not read string header.\n");
+    }
     //find hardware
-    decode = get_recordtype(ptu_header->RecordType)//need to define header, record type
-    pq_header.FormatVersion = ptu_header.FormatVersion
+    uint32_t isT2 = get_recordtype(ptu_header.TTResultFormat_TTTRRecType);//need to define header, record type
+    
+    sprintf(pq_header->FormatVersion, "%s", ptu_header.CreatorSW_ContentVersion);
     
     //read it!
-    if ( decode == NULL ) {
-		error("Could not identify board %s.\n", pq_header.Ident, pq_header.FormatVersion, ftell);
-    } else if ( isT2) { //need to define isT2?
-        tttr_t tttr;//only for t2?
-        tttr = tttr_init(ptu_header, &tttr);
-		result = pq_t2_stream(in_stream, out_stream, decode, tttr, options)
-	} else {
-        result = pq_t3_stream(in_stream, out_stream, decode, tttr, options)//also needs fixing
+    if ( isT2 == '\0' ) {
+		  error("Board is not supported in ptu format: %s.\n", pq_header->Ident, pq_header->FormatVersion, ftell);
+    } else if ( options->print_header ) {
+			if ( options->binary_out ) {
+				ptu_header_fwrite(out_stream, &ptu_header);
+			} else {
+				pq_header_printf(out_stream, pq_header);
+			}
+	  } else if ( options->print_mode ) {
+			if ( ptu_header.Measurement_Mode == HH_MODE_INTERACTIVE ) {
+				fprintf(out_stream, "interactive\n");
+			} else if ( ptu_header.Measurement_Mode == HH_MODE_T2 ) {
+				fprintf(out_stream, "t2\n");
+			} else if ( ptu_header.Measurement_Mode == HH_MODE_T3 ) {
+				fprintf(out_stream, "t3\n");
+			} else {
+				error("Measurement mode not recognized: %"PRId32".\n",
+						ptu_header.Measurement_Mode);
+				return(PQ_ERROR_MODE);
+			}
+	  } else if ( isT2) { 
+		  result = ptu_hh_v20_t2_stream(in_stream, out_stream, &ptu_header, options);
+	  } else {
+      result = ptu_hh_v20_t3_stream(in_stream, out_stream, &ptu_header, options);
     }                                     
 
 	return(result);
 }
 
-ptu_header_t ptu_header_parse(FILE *in_stream, File *out_stream){
-  ptu_header_t ptu_header
-  char Magic[8];
-  char Version[8];
-  char Buffer[40];
-  char* AnsiBuffer;
-  WCHAR* WideBuffer;
-  int Result;
 
-  long long NumRecords = -1;
-  long long RecordType = 0;
-
-  TagHead_t TagHead;
-  fseek(in_stream, sizeof(Magic)+sizeof(Version), SEEK_SET)//make sure we start at the right place
-  // read tagged header
-  do
-  {
-    // This loop is very generic. It reads all header items and displays the identifier and the
-    // associated value, quite independent of what they mean in detail.
-    // Only some selected items are explicitly retrieved and kept in memory because they are 
-    // needed to subsequently interpret the TTTR record data.
-
-    Result = fread( &TagHead, 1, sizeof(TagHead) ,fpin);
-    if (Result!= sizeof(TagHead))
-    {
-        error("Incomplete file in header of ptu")
-    }
-
-    strcpy(Buffer, TagHead.Ident);
-    if (TagHead.Idx > -1)
-    {
-      sprintf(Buffer, "%s(%d)", TagHead.Ident,TagHead.Idx);//puts formatted output into buffer
-    }
-    fprintf(fpout, "\n%-40s", Buffer);
-    switch (TagHead.Typ)
-    {
-      case tyEmpty8:
-        fprintf(fpout, "<empty Tag>");
-        break;
-      case tyBool8:
-        fprintf(fpout, "%s", bool(TagHead.TagValue)?"True":"False");
-        fprintf(fpout, "  tyBool8");
-        break;
-      case tyInt8:
-        fprintf(fpout, "%lld", TagHead.TagValue);
-        fprintf(fpout, "  tyInt8");
-        // get some Values we need to analyse records
-        if (strcmp(TagHead.Ident, TTTRTagNumRecords)==0) // Number of records
-          NumRecords = TagHead.TagValue;
-        if (strcmp(TagHead.Ident, TTTRTagTTTRRecType)==0) // TTTR RecordType
-          RecordType = TagHead.TagValue;
-        break;
-      case tyBitSet64:
-        fprintf(fpout, "0x%16.16X", TagHead.TagValue);
-        fprintf(fpout, "  tyBitSet64");
-        break;
-      case tyColor8:
-        fprintf(fpout, "0x%16.16X", TagHead.TagValue);
-        fprintf(fpout, "  tyColor8");
-        break;
-      case tyFloat8:
-        fprintf(fpout, "%E", *(double*)&(TagHead.TagValue));
-        fprintf(fpout, "  tyFloat8");
-        if (strcmp(TagHead.Ident, TTTRTagRes)==0) // Resolution for TCSPC-Decay
-          Resolution = *(double*)&(TagHead.TagValue);
-        if (strcmp(TagHead.Ident, TTTRTagGlobRes)==0) // Global resolution for timetag
-          GlobRes = *(double*)&(TagHead.TagValue); // in ns
-        break;
-      case tyFloat8Array:
-        fprintf(fpout, "<Float Array with %d Entries>", TagHead.TagValue / sizeof(double));
-        fprintf(fpout, "  tyFloat8Array");
-        // only seek the Data, if one needs the data, it can be loaded here
-        fseek(fpin, (long)TagHead.TagValue, SEEK_CUR);
-        break;
-      case tyTDateTime:
-        time_t CreateTime;
-        CreateTime = TDateTime_TimeT(*((double*)&(TagHead.TagValue)));
-        fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
-        fprintf(fpout, "  tyTDateTime");
-        break;
-      case tyAnsiString:
-        AnsiBuffer = (char*)calloc((size_t)TagHead.TagValue,1);
-        Result = fread(AnsiBuffer, 1, (size_t)TagHead.TagValue, fpin);
-        if (Result!= TagHead.TagValue){
-          printf("\nIncomplete File.");
-          free(AnsiBuffer);
-          goto close;
-        }
-        fprintf(fpout, "%s", AnsiBuffer);
-        fprintf(fpout, "  tyAnsiString");
-        free(AnsiBuffer);
-        break;
-      case tyWideString:
-        WideBuffer = (WCHAR*)calloc((size_t)TagHead.TagValue,1);
-        Result = fread(WideBuffer, 1, (size_t)TagHead.TagValue, fpin);
-        if (Result!= TagHead.TagValue){
-          printf("\nIncomplete File.");
-          free(WideBuffer);
-          goto close;
-        }
-        //fwprintf(fpout, L"%s", WideBuffer);
-        fprintf(fpout, "  tyWideString");
-        free(WideBuffer);
-        break;
-      case tyBinaryBlob:
-        fprintf(fpout, "<Binary Blob contains %d Bytes>", TagHead.TagValue);
-        fprintf(fpout, "  tyBinaryBlob");
-        // only seek the Data, if one needs the data, it can be loaded here
-        fseek(fpin, (long)TagHead.TagValue, SEEK_CUR);
-        break;
-      default:
-        printf("Illegal Type identifier found! Broken file?");
-        goto close;
-    }
-  }
-  while((strncmp(TagHead.Ident, FileTagEnd, sizeof(FileTagEnd))));
-
-  return ptu_header
-// End Header loading
-}
-
-pq_dispatch_t get_recordtype(long long RecordType){ //only hydraharp gives correct version
+int get_recordtype(int32_t RecordType){ //only hydraharp gives correct version
     // TTTR Record type
   switch (RecordType)
   {
+    case rtHydraHarp2T2:
+      return true;//DOES THIS WORK?
+      //return ptu_hh_v20_t2_stream(FILE *stream_in, FILE *stream_out,
+      // ptu_header_t *ptu_header, options_t *options) 
+      //fprintf(fpout, "HydraHarp V2 T2 data\n");
+      //fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
+      break;
+    case rtHydraHarp2T3:
+      return false;//DOES THIS WORK?
+      //return ptu_hh_v20_t3_stream(FILE *stream_in, FILE *stream_out,
+      // ptu_header_t *ptu_header, options_t *options)
+      //fprintf(fpout, "HydraHarp V2 T3 data\n");
+      //fprintf(fpout,"\nrecord# chan   nsync truetime/ns dtime\n");
+      break;
+    
+    //need to add errors
+
+    /*
+    
+    //none of the rest of these are set up, only hydraharp
     case rtPicoHarpT2:
       fprintf(fpout, "PicoHarp T2 data\n");
       fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
@@ -238,16 +183,6 @@ pq_dispatch_t get_recordtype(long long RecordType){ //only hydraharp gives corre
       fprintf(fpout,"\nrecord# chan   nsync truetime/ns dtime\n");
       return(hh_dispatch);
       break;
-    case rtHydraHarp2T2:
-      fprintf(fpout, "HydraHarp V2 T2 data\n");
-      fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
-      return(hh_v20_tttr_stream);
-      break;
-    case rtHydraHarp2T3:
-      fprintf(fpout, "HydraHarp V2 T3 data\n");
-      fprintf(fpout,"\nrecord# chan   nsync truetime/ns dtime\n");
-      return(hh_v20_tttr_stream);
-      break;
 	case rtTimeHarp260NT3:
       fprintf(fpout, "TimeHarp260N T3 data\n");
       fprintf(fpout,"\nrecord# chan   nsync truetime/ns dtime\n");
@@ -267,10 +202,10 @@ pq_dispatch_t get_recordtype(long long RecordType){ //only hydraharp gives corre
       fprintf(fpout, "TimeHarp260P T2 data\n");
       fprintf(fpout,"\nrecord# chan   nsync truetime/ps\n");
       return(th_dispatch);
-      break;
+      break;*/
   default:
-    fprintf(fpout, "Unknown record type: 0x%X\n 0x%X\n ", RecordType);
-    return NULL;
+    error("Unknown record type: 0x%X\n 0x%X\n ", RecordType);
+    return '\0';
   }
   
 }

@@ -38,9 +38,15 @@
 #include "options.h"
 
 #include "header.h"
+#include "ptu_dispatch.h"
+
+
+
+
 #include "interactive.h"
 #include "t2.h"
 #include "t3.h"
+
 
 // General board and mode dispatch
 typedef int (*pq_dispatch_t)(FILE *, FILE *, pq_header_t *, options_t *);
