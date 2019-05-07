@@ -109,13 +109,14 @@ int ptu_dispatch(FILE *in_stream, FILE *out_stream, pq_header_t *pq_header,
     sprintf(pq_header->FormatVersion, "%s", ptu_header.CreatorSW_ContentVersion);
     
     //read it!
-    if ( isT2 == '\0' ) {
-		  error("Board is not supported in ptu format: %s.\n", pq_header->Ident, pq_header->FormatVersion, ftell);
-    } else if ( options->print_header ) {
+    //if ( isT2 == '\0' ) {
+		//  error("Board is not supported in ptu format: %s.\n", pq_header->Ident, pq_header->FormatVersion, ftell);
+    //} else
+    if ( options->print_header ) {
 			if ( options->binary_out ) {
 				ptu_header_fwrite(out_stream, &ptu_header);
 			} else {
-				pq_header_printf(out_stream, pq_header);
+				ptu_header_printf(out_stream, &ptu_header);
 			}
 	  } else if ( options->print_mode ) {
 			if ( ptu_header.Measurement_Mode == HH_MODE_INTERACTIVE ) {

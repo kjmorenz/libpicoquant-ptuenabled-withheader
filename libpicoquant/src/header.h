@@ -356,5 +356,6 @@ int ptu_header_parse(FILE *in_stream, ptu_header_t *ptu_header);
 void pq_header_printf(FILE *out_stream, pq_header_t *pq_header);
 void pq_header_fwrite(FILE *out_stream, pq_header_t *pq_header);
 void ptu_header_fwrite(FILE *stream_out, ptu_header_t *ptu_header);
+void ptu_header_printf(FILE *out_stream, ptu_header_t *ptu_header);
 
 #endif 
